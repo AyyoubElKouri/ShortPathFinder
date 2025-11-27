@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 100;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 200;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 300;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 500;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 600;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 700;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 800;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "BricolageGrotesque";
+	src: url("/fonts/BricolageGrotesque.ttf") format("truetype");
+	font-weight: 900;
+	font-style: normal;
+}
+
+body {
+	font-family: BricolageGrotesque, sans-serif;
+}
+
+::-webkit-scrollbar {
+	width: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: #27272a;
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: #4b5563;
+	border-radius: 3px;
+	transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background-color: #6366f1;
+}
+
+* {
+	scrollbar-width: thin; /* fin */
+	scrollbar-color: #4b5563 #27272a;
+}
+
+::-webkit-scrollbar-horizontal {
+	height: 6px;
+}
