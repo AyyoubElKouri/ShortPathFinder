@@ -26,15 +26,19 @@ export function useRun() {
 		) => {
 			for (let i = 0; i < cells.length; i += BATCH_SIZE) {
 				const batch = cells.slice(i, i + BATCH_SIZE);
+
+				const cellules = useGridStore.getState().cellules;
+
 				batch.forEach((index) => {
 					const x = index % cols;
 					const y = Math.floor(index / cols);
-					const currentType = useGridStore.getState().cellules[y][x].type;
+					const currentType = cellules[y][x].type;
 					if (currentType !== "start" && currentType !== "end") {
 						updateCell({ x, y, type });
 					}
 				});
-				await new Promise(requestAnimationFrame);
+
+				await new Promise((resolve) => setTimeout(resolve, 16)); // ~60fps
 			}
 		};
 
