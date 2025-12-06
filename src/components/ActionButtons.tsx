@@ -4,10 +4,12 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { useGrid } from "@/hooks/useGrid";
+import { useRunPathfinding } from "@/hooks/useRunPathfinding";
 import { LINK } from "@/lib/constants";
 
 export function ActionButtons() {
 	const { clearWalls, clearPath, resetGrid } = useGrid();
+	const { execute } = useRunPathfinding();
 
 	return (
 		<div
@@ -16,7 +18,7 @@ export function ActionButtons() {
 			style={{ transform: "translateX(-50%)" }}
 		>
 			<div className="flex gap-2">
-				<Button onClick={() => {}}>Run Algorithm</Button>
+				<Button onClick={execute}>Run Algorithm</Button>
 				<Button onClick={clearWalls}>Clear Walls</Button>
 				<Button onClick={clearPath}>Clear Path</Button>
 				<Button onClick={resetGrid}>Reset Grid</Button>

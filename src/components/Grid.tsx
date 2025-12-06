@@ -6,6 +6,7 @@
 import { useGrid } from "@/hooks/useGrid";
 import { ActionButtons } from "./ActionButtons";
 import { Instructions } from "./Instructions";
+import { usePathfindingAdapter } from "@/hooks/usePathfindingAdapter";
 
 export function Grid() {
 	const {
@@ -18,6 +19,8 @@ export function Grid() {
 		showInstructions,
 		setShowInstructions,
 	} = useGrid();
+
+	const { runPathfinding } = usePathfindingAdapter();
 
 	return (
 		<button

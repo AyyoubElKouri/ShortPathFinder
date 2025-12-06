@@ -8,3 +8,5 @@ createRoot(document.getElementById("root")!).render(
 		<Home />
 	</StrictMode>,
 );
+
+// SmartLib – Intelligent library system for book tracking, user management, and borrowing

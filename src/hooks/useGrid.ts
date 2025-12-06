@@ -74,17 +74,17 @@ export function useGrid() {
 			case "empty":
 				return "#F7F7F7";
 			case "wall":
-				return "#222";
+				return "#1C1C1C";
 			case "start":
-				return "#08f";
+				return "#0059B3";
 			case "end":
-				return "#f00";
+				return "#C62828";
 			case "path":
-				return "#0f0";
+				return "#4B4F8F";
 			case "visited":
-				return "#ff0";
+				return "#7C8A9C";
 			default:
-				return "#ccc";
+				return "#444";
 		}
 	}
 
