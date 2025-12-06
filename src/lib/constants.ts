@@ -19,5 +19,7 @@ export const LINK = "https://ayyoubelkouri.vercel.app";
 export const GRID_COLS = 50;
 export const GRID_ROWS = 30;
 
+export const CELL_SIZE = 25;
+
 export const BATCH_SIZE = 5;
 export const DELAY_MS = 10;

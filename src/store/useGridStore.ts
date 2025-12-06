@@ -5,7 +5,7 @@
 
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { GRID_COLS, GRID_ROWS } from "@/lib/constants";
+import { CELL_SIZE, GRID_COLS, GRID_ROWS } from "@/lib/constants";
 
 export interface Cellule {
 	x: number;
@@ -37,7 +37,7 @@ export const useGridStore = create<GridStore>()(
 	devtools(
 		(set, get) => ({
 			// Initial state
-			cellSize: 20,
+			cellSize: CELL_SIZE,
 			rows: GRID_ROWS,
 			cols: GRID_COLS,
 			cellules: createInitialGrid(GRID_ROWS, GRID_COLS),
