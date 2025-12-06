@@ -27,7 +27,7 @@ export function useGrid() {
 
 	useEffect(() => {
 		const rows = Math.floor(height / cellSize);
-		const cols = Math.floor((width * 0.75) / cellSize);
+		const cols = Math.floor(width / cellSize);
 
 		setRows(rows);
 		setCols(cols);

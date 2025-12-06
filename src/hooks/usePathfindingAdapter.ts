@@ -91,3 +91,4 @@ export function usePathfindingAdapter() {
 
 	return { runPathfinding };
 }
+

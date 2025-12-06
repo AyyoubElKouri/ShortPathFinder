@@ -3,14 +3,4 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-import { Control } from "./components/Control";
-import { Grid } from "./components/Grid";
-
-export default function Home() {
-	return (
-		<div className="relative w-full h-svh flex justify-center bg-[#F7F7F7]">
-			<Grid />
-			<Control />
-		</div>
-	);
-}
+export function ModeSelector() {}

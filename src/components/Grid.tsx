@@ -4,9 +4,6 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { useGrid } from "@/hooks/useGrid";
-import { ActionButtons } from "./ActionButtons";
-import { Instructions } from "./Instructions";
-import { usePathfindingAdapter } from "@/hooks/usePathfindingAdapter";
 
 export function Grid() {
 	const {
@@ -16,11 +13,7 @@ export function Grid() {
 		handleMouseEnter,
 		handleMouseUp,
 		getCellColor,
-		showInstructions,
-		setShowInstructions,
 	} = useGrid();
-
-	const { runPathfinding } = usePathfindingAdapter();
 
 	return (
 		<button
@@ -39,9 +32,6 @@ export function Grid() {
 				}}
 				onMouseUp={handleMouseUp}
 			>
-				{showInstructions && (
-					<Instructions setShowInstructions={setShowInstructions} />
-				)}
 				{cellules.flat().map((cell) => {
 					return (
 						<button
@@ -64,7 +54,6 @@ export function Grid() {
 					);
 				})}
 			</button>
-			<ActionButtons />
 		</button>
 	);
 }

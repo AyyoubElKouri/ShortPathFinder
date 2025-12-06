@@ -3,14 +3,18 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-import { Control } from "./components/Control";
-import { Grid } from "./components/Grid";
-
-export default function Home() {
+export function Seperator({
+	orientation = "vertical",
+}: {
+	orientation?: "vertical" | "horizontal";
+}) {
 	return (
-		<div className="relative w-full h-svh flex justify-center bg-[#F7F7F7]">
-			<Grid />
-			<Control />
-		</div>
+		<div
+			className={
+				orientation === "vertical"
+					? "w-[0.4px] h-full bg-white/30"
+					: "h-[0.4px] w-full bg-white/30"
+			}
+		/>
 	);
 }
