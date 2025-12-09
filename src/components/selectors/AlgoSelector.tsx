@@ -3,13 +3,14 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-import { ChevronsLeftRight } from "lucide-react";
+import { Cpu } from "lucide-react";
 import { useState } from "react";
 
-import { ALGORITHMS, FULL_TO_SHORT } from "@/lib/constants";
+import { ALGORITHMS } from "@/lib/constants";
 import type { Algorithm } from "@/lib/types";
 
 import { useAlgorithmStore } from "@/store/useAlgorithmStore";
+import { Button } from "../ui/Button";
 
 export function AlgoSelector() {
 	const [open, setOpen] = useState(false);
@@ -20,20 +21,15 @@ export function AlgoSelector() {
 		setOpen(false);
 	}
 
-	const shortName = FULL_TO_SHORT[algorithm] ?? algorithm;
-
 	return (
 		<div className="relative flex flex-col items-center">
 			<div className="relative flex flex-col items-center">
-				<button
-					type="button"
-					onClick={() => setOpen((v) => !v)}
-					className="w-[100px] h-8.5 border border-white/10 flex justify-center items-center
-                          rounded-[5px] bg-[#3E3524] text-white active:scale-95
-                          hover:brightness-130 gap-1"
-				>
-					{shortName} <ChevronsLeftRight />
-				</button>
+				<Button
+					icon={<Cpu />}
+					shortcut="A"
+					label={algorithm}
+					callback={() => setOpen((v) => !v)}
+				/>
 			</div>
 
 			{open && (

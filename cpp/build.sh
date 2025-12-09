@@ -4,6 +4,7 @@ emcc \
   AlgorithmFactory/AlgorithmFactory.cc \
   Algorithms/DijkstraAlgorithm.cc \
   Algorithms/AStartAlgorithm.cc \
+  Algorithms/BFSAlgorithm.cc \
   PathfindingEngine/PathfindingEngine.cc \
   -I. \
   -lembind \

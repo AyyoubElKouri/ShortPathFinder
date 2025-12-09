@@ -12,8 +12,8 @@ export function Seperator({
 		<div
 			className={
 				orientation === "vertical"
-					? "w-[0.4px] h-full bg-white/30"
-					: "h-[0.4px] w-full bg-white/30"
+					? "w-px h-[80%] bg-linear-to-b from-transparent via-white/40 to-transparent relative before:absolute before:inset-0 before:bg-linear-to-b before:from-transparent before:via-white/10 before:to-transparent before:blur-[0.5px]"
+					: "h-px w-[80%] bg-linear-to-r from-transparent via-white/40 to-transparent relative before:absolute before:inset-0 before:bg-linear-to-r before:from-transparent before:via-white/10 before:to-transparent before:blur-[0.5px]"
 			}
 		/>
 	);

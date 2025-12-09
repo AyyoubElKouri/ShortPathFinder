@@ -3,12 +3,13 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-import { ChevronsLeftRight } from "lucide-react";
+import { Settings2 } from "lucide-react";
 import { useState } from "react";
 
 import { useAlgorithmStore } from "@/store/useAlgorithmStore";
-import { Switcher } from "../Switcher";
-import { Seperator } from "../Seperator";
+import { Switcher } from "../ui/Switcher";
+import { Seperator } from "../ui/Seperator";
+import { Button } from "../ui/Button";
 
 export function ConfigSelector() {
 	const [open, setOpen] = useState(false);
@@ -17,15 +18,12 @@ export function ConfigSelector() {
 	return (
 		<div className="relative flex flex-col items-center">
 			<div className="relative flex flex-col items-center">
-				<button
-					type="button"
-					onClick={() => setOpen((v) => !v)}
-					className="w-[100px] h-8.5 border border-white/10 flex justify-center items-center
-                          rounded-[5px] bg-[#383939] text-white active:scale-95
-                          hover:brightness-130 gap-1"
-				>
-					Config <ChevronsLeftRight />
-				</button>
+				<Button
+					icon={<Settings2 />}
+					shortcut="C"
+					label="Config"
+					callback={() => setOpen((v) => !v)}
+				/>
 			</div>
 
 			{open && (

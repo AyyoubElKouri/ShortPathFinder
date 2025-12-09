@@ -15,7 +15,7 @@ export interface PathfindingResult {
 	cost: number;
 }
 
-export function usePathfindingAdapter() {
+export function useWebAssembly() {
 	const { cellules, rows, cols } = useGridStore();
 	const { algorithm, config } = useAlgorithmStore();
 

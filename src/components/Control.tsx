@@ -3,6 +3,7 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
+import { motion } from "framer-motion";
 import { useRun } from "@/hooks/useRun";
 import {
 	Atom,
@@ -13,54 +14,67 @@ import {
 	Settings,
 } from "lucide-react";
 import { useGrid } from "@/hooks/useGrid";
-import { ControlButton } from "./ControlButton";
-import { Seperator } from "./Seperator";
+import { Button } from "./ui/Button";
+import { Seperator } from "./ui/Seperator";
 import { AlgoSelector } from "./selectors/AlgoSelector";
 import { ConfigSelector } from "./selectors/ConfigSelector";
 
 export function Control() {
-	const { clearWalls, clearPath, resetGrid } = useGrid();
+	const { clearWalls, clearPath, resetGrid, generateMaze } = useGrid();
 	const { execute } = useRun();
 
 	return (
-		<div
+		<motion.div
+			layout
 			className="absolute h-13 bottom-5 left-1/2 -translate-x-1/2 flex justify-center items-center
-							 gap-[9px] bg-[#2C2D2D] px-[9px] rounded-lg"
+							 gap-[9px] bg-[#2C2D2D] px-[9px] rounded-lg
+							 border border-[#404141] 
+							 shadow-[0_4px_16px_rgba(0,0,0,0.6),0_2px_4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.3)]"
+			transition={{ type: "spring", stiffness: 300, damping: 30 }} // animation fluide
 		>
-			<ControlButton content={<Settings />} message="Settings" />
+			<Button icon={<Settings />} label="Settings" shortcut="S" />
 			<Seperator />
 
 			<AlgoSelector />
 			<ConfigSelector />
 			<Seperator />
 
-			<ControlButton content={<Atom />} message="Generate Maze" />
+			<Button
+				label="Generate Maze"
+				shortcut="M"
+				icon={<Atom />}
+				callback={generateMaze}
+			/>
 			<Seperator />
 
-			<ControlButton
-				content={<RotateCcw />}
-				message="Reset Grid"
+			<Button
+				label="Reset Grid"
+				shortcut="R"
+				icon={<RotateCcw />}
 				callback={resetGrid}
 			/>
 
-			<ControlButton
-				content={<BrickWall />}
-				message="Clear Walls"
+			<Button
+				label="Clear Walls"
+				shortcut="W"
+				icon={<BrickWall />}
 				callback={clearWalls}
 			/>
 
-			<ControlButton
-				content={<Route />}
-				message="Clear Path"
+			<Button
+				label="Clear Path"
+				shortcut="P"
+				icon={<Route />}
 				callback={clearPath}
 			/>
 
-			<ControlButton
+			<Button
 				isRun={true}
-				content={<Play />}
-				message="Start Pathfinding"
+				label="Start Algorithm"
+				shortcut="Enter"
+				icon={<Play />}
 				callback={execute}
 			/>
-		</div>
+		</motion.div>
 	);
 }

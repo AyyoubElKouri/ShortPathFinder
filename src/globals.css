@@ -94,3 +94,7 @@ body {
 ::-webkit-scrollbar-horizontal {
 	height: 6px;
 }
+
+*:focus {
+  outline: none;
+}

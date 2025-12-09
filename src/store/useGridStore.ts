@@ -29,6 +29,8 @@ export interface GridStore {
 	clearWalls: () => void;
 	clearPath: () => void;
 	resetGrid: () => void;
+	generateMaze: () => void;
+	readyToRun: () => void;
 	undo: () => void;
 	redo: () => void;
 }
@@ -173,20 +175,226 @@ export const useGridStore = create<GridStore>()(
 				});
 			},
 
-			undo: () => {
-				const { history, cellules, future } = get();
+			generateMaze: () => {
+				const { cellules, history, rows, cols } = get();
 
-				if (history.length === 0) return;
+				// Save current state to history
+				const newHistory = [...history, deepCopyGrid(cellules)];
 
-				const previousState = history[history.length - 1];
-				const newHistory = history.slice(0, -1);
-				const newFuture = [deepCopyGrid(cellules), ...future];
+				// Create new grid and preserve start/end positions
+				const newGrid = deepCopyGrid(cellules);
+				const { start, end } = findSpecialCells(newGrid);
+
+				// Initialize all cells as walls (except start/end)
+				for (const row of newGrid) {
+					for (const cell of row) {
+						if (cell.type !== "start" && cell.type !== "end") {
+							cell.type = "wall";
+						}
+					}
+				}
+
+				// Use current time as seed for random generation
+				const seed = Date.now();
+				let randomState = seed;
+
+				// Seeded random number generator
+				const seededRandom = () => {
+					randomState = (randomState * 9301 + 49297) % 233280;
+					return randomState / 233280;
+				};
+
+				// Shuffle array helper
+				const shuffle = <T>(array: T[]): T[] => {
+					const arr = [...array];
+					for (let i = arr.length - 1; i > 0; i--) {
+						const j = Math.floor(seededRandom() * (i + 1));
+						[arr[i], arr[j]] = [arr[j], arr[i]];
+					}
+					return arr;
+				};
+
+				// Recursive Backtracking Algorithm
+				const visited: boolean[][] = Array.from({ length: rows }, () =>
+					Array(cols).fill(false),
+				);
+
+				const directions = [
+					{ dx: 0, dy: -2, name: "up" }, // up (skip one cell)
+					{ dx: 2, dy: 0, name: "right" }, // right
+					{ dx: 0, dy: 2, name: "down" }, // down
+					{ dx: -2, dy: 0, name: "left" }, // left
+				];
+
+				const carvePassage = (x: number, y: number) => {
+					visited[y][x] = true;
+
+					// Mark current cell as passage
+					if (
+						newGrid[y][x].type !== "start" &&
+						newGrid[y][x].type !== "end"
+					) {
+						newGrid[y][x].type = "empty";
+					}
+
+					// Randomize direction order
+					const dirs = shuffle(directions);
+
+					for (const dir of dirs) {
+						const nx = x + dir.dx;
+						const ny = y + dir.dy;
+
+						// Check if new position is valid
+						if (
+							nx >= 0 &&
+							nx < cols &&
+							ny >= 0 &&
+							ny < rows &&
+							!visited[ny][nx]
+						) {
+							// Carve wall between current and next cell
+							const wallX = x + dir.dx / 2;
+							const wallY = y + dir.dy / 2;
+
+							if (
+								newGrid[wallY][wallX].type !== "start" &&
+								newGrid[wallY][wallX].type !== "end"
+							) {
+								newGrid[wallY][wallX].type = "empty";
+							}
+
+							// Recursively carve from next cell
+							carvePassage(nx, ny);
+						}
+					}
+				};
+
+				// Start carving from a valid position
+				let startX = start ? start.x : 1;
+				let startY = start ? start.y : 1;
+
+				// Ensure start position is odd (for proper maze generation)
+				if (startX % 2 === 0) startX = Math.max(1, startX - 1);
+				if (startY % 2 === 0) startY = Math.max(1, startY - 1);
+
+				// Generate the maze
+				carvePassage(startX, startY);
+
+				// Make sure start and end positions are passages
+				if (start) {
+					newGrid[start.y][start.x].type = "start";
+					// Clear around start if needed
+					for (const dir of [
+						{ dx: 0, dy: -1 },
+						{ dx: 1, dy: 0 },
+						{ dx: 0, dy: 1 },
+						{ dx: -1, dy: 0 },
+					]) {
+						const nx = start.x + dir.dx;
+						const ny = start.y + dir.dy;
+						if (
+							isWithinBounds(nx, ny, newGrid) &&
+							newGrid[ny][nx].type === "wall" &&
+							seededRandom() > 0.5
+						) {
+							newGrid[ny][nx].type = "empty";
+						}
+					}
+				}
+
+				if (end) {
+					newGrid[end.y][end.x].type = "end";
+					// Clear around end if needed
+					for (const dir of [
+						{ dx: 0, dy: -1 },
+						{ dx: 1, dy: 0 },
+						{ dx: 0, dy: 1 },
+						{ dx: -1, dy: 0 },
+					]) {
+						const nx = end.x + dir.dx;
+						const ny = end.y + dir.dy;
+						if (
+							isWithinBounds(nx, ny, newGrid) &&
+							newGrid[ny][nx].type === "wall" &&
+							seededRandom() > 0.5
+						) {
+							newGrid[ny][nx].type = "empty";
+						}
+					}
+				}
+
+				// Ensure connectivity between start and end
+				if (start && end) {
+					ensurePathExists(newGrid, start, end, seededRandom);
+				}
+
+				// Add some random openings to make it less perfect (optional)
+				const openingChance = 0.1; // 10% chance to remove some walls
+				for (let y = 1; y < rows - 1; y++) {
+					for (let x = 1; x < cols - 1; x++) {
+						if (
+							newGrid[y][x].type === "wall" &&
+							seededRandom() < openingChance
+						) {
+							// Check if removing this wall doesn't create 2x2 empty spaces
+							let emptyNeighbors = 0;
+							for (const dir of [
+								{ dx: 0, dy: -1 },
+								{ dx: 1, dy: 0 },
+								{ dx: 0, dy: 1 },
+								{ dx: -1, dy: 0 },
+							]) {
+								const nx = x + dir.dx;
+								const ny = y + dir.dy;
+								if (
+									isWithinBounds(nx, ny, newGrid) &&
+									newGrid[ny][nx].type === "empty"
+								) {
+									emptyNeighbors++;
+								}
+							}
+
+							// Only remove wall if it has 2 or fewer empty neighbors
+							if (emptyNeighbors <= 2) {
+								newGrid[y][x].type = "empty";
+							}
+						}
+					}
+				}
 
 				set({
-					cellules: previousState,
+					cellules: newGrid,
 					history: newHistory,
-					future: newFuture,
+					future: [],
 				});
+			},
+
+			readyToRun: () => {
+				
+				const { cellules } = get();
+
+				// Check if the grid is valid (contains start, end cells)
+				const {start, end} = findSpecialCells(cellules);
+				if(!start || !end) throw new Error("Start or End cell are not provided");
+
+				const newGrid = deepCopyGrid(cellules);
+				let modified = false;
+
+				for (const row of newGrid) {
+					for (const cell of row) {
+						if (cell.type === "path" || cell.type === "visited") {
+							cell.type = "empty";
+							modified = true;
+						}
+					}
+				}
+
+				// Only update if something was actually cleared
+				if (modified) {
+					set({
+						cellules: newGrid,
+					});
+				}
 			},
 
 			resetGrid: () => {
@@ -204,6 +412,22 @@ export const useGridStore = create<GridStore>()(
 					cellules: newGrid,
 					history: [...history, deepCopyGrid(cellules)],
 					future: [],
+				});
+			},
+
+			undo: () => {
+				const { history, cellules, future } = get();
+
+				if (history.length === 0) return;
+
+				const previousState = history[history.length - 1];
+				const newHistory = history.slice(0, -1);
+				const newFuture = [deepCopyGrid(cellules), ...future];
+
+				set({
+					cellules: previousState,
+					history: newHistory,
+					future: newFuture,
 				});
 			},
 
@@ -402,3 +626,69 @@ function handleImmediateCommit(
 	});
 }
 
+function ensurePathExists(
+	grid: Cellule[][],
+	start: Cellule,
+	end: Cellule,
+	random: () => number,
+): void {
+	// Simple BFS to check if path exists
+	const queue: { x: number; y: number }[] = [{ x: start.x, y: start.y }];
+	const visited: boolean[][] = Array.from({ length: grid.length }, () =>
+		Array(grid[0].length).fill(false),
+	);
+	visited[start.y][start.x] = true;
+
+	const directions = [
+		{ dx: 0, dy: -1 },
+		{ dx: 1, dy: 0 },
+		{ dx: 0, dy: 1 },
+		{ dx: -1, dy: 0 },
+	];
+
+	let pathExists = false;
+
+	while (queue.length > 0) {
+		const current = queue.shift()!;
+
+		if (current.x === end.x && current.y === end.y) {
+			pathExists = true;
+			break;
+		}
+
+		for (const dir of directions) {
+			const nx = current.x + dir.dx;
+			const ny = current.y + dir.dy;
+
+			if (
+				isWithinBounds(nx, ny, grid) &&
+				!visited[ny][nx] &&
+				grid[ny][nx].type !== "wall"
+			) {
+				visited[ny][nx] = true;
+				queue.push({ x: nx, y: ny });
+			}
+		}
+	}
+
+	// If no path exists, carve one
+	if (!pathExists) {
+		let cx = start.x;
+		let cy = start.y;
+
+		while (cx !== end.x || cy !== end.y) {
+			// Move towards end
+			if (cx < end.x && random() > 0.3) cx++;
+			else if (cx > end.x && random() > 0.3) cx--;
+			else if (cy < end.y) cy++;
+			else if (cy > end.y) cy--;
+			else if (cx < end.x) cx++;
+			else if (cx > end.x) cx--;
+
+			// Clear the cell if it's a wall
+			if (grid[cy][cx].type === "wall") {
+				grid[cy][cx].type = "empty";
+			}
+		}
+	}
+}

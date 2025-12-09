@@ -21,6 +21,7 @@ export function useGrid() {
 		clearWalls,
 		clearPath,
 		resetGrid,
+		generateMaze,
 	} = useGridStore();
 
 	const { width, height } = useScreen();
@@ -72,19 +73,17 @@ export function useGrid() {
 	function getCellColor(cell: Cellule): string {
 		switch (cell.type) {
 			case "empty":
-				return "#F7F7F7";
+				return "#141114";
 			case "wall":
-				return "#1C1C1C";
+				return "#3C393C";
 			case "start":
-				return "#0059B3";
+				return "#92FA13";
 			case "end":
-				return "#C62828";
+				return "#FC2930";
 			case "path":
-				return "#4B4F8F";
+				return "#FAFA03";
 			case "visited":
-				return "#7C8A9C";
-			default:
-				return "#444";
+				return "#1474FF";
 		}
 	}
 
@@ -98,6 +97,7 @@ export function useGrid() {
 		clearWalls,
 		clearPath,
 		resetGrid,
+		generateMaze,
 		showInstructions,
 		setShowInstructions,
 	};
