@@ -4,12 +4,12 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { motion } from "framer-motion";
-import { Control } from "./components/Control";
-import { Grid } from "./components/Grid";
-import useRunStore from "./store/useRunStore";
+import { Control } from "@/components/Control";
+import { Grid } from "@/components/Grid";
+import useGridStore from "@/store/useGridStore";
 
 export default function Home() {
-	const { isRunning } = useRunStore();
+	const { isRunning } = useGridStore();
 
 	return (
 		<div className="relative w-full h-svh flex justify-center bg-[#141114]">

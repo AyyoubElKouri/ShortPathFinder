@@ -3,7 +3,7 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-import type { Cellule } from "./useGridStore";
+import type { Cellule } from "@/lib/types";
 import { useGridStore } from "./useGridStore";
 
 describe("GridStore", () => {
@@ -17,7 +17,7 @@ describe("GridStore", () => {
 				Array.from({ length: 15 }, (_, x) => ({
 					x,
 					y,
-					type: "empty" as const,
+					state: "empty" as const,
 				})),
 			),
 			history: [],
@@ -38,7 +38,7 @@ describe("GridStore", () => {
 			const { cellules } = useGridStore.getState();
 			expect(cellules.length).toBe(15);
 			expect(cellules[0].length).toBe(15);
-			expect(cellules[0][0].type).toBe("empty");
+			expect(cellules[0][0].state).toBe("empty");
 		});
 
 		it("should have empty history and future", () => {
@@ -118,78 +118,78 @@ describe("GridStore", () => {
 	describe("updateCell - Basic functionality", () => {
 		it("should place start on first click on empty cell", () => {
 			const { updateCell } = useGridStore.getState();
-			const cell: Cellule = { x: 0, y: 0, type: "empty" };
+			const cell: Cellule = { x: 0, y: 0, state: "empty" };
 
 			updateCell(cell);
 
 			const updatedState = useGridStore.getState();
-			expect(updatedState.cellules[0][0].type).toBe("start");
+			expect(updatedState.cellules[0][0].state).toBe("start");
 		});
 
 		it("should place end on second click when start exists", () => {
 			const { updateCell } = useGridStore.getState();
-			const startCell: Cellule = { x: 0, y: 0, type: "empty" };
-			const endCell: Cellule = { x: 1, y: 1, type: "empty" };
+			const startCell: Cellule = { x: 0, y: 0, state: "empty" };
+			const endCell: Cellule = { x: 1, y: 1, state: "empty" };
 
 			updateCell(startCell);
 			updateCell(endCell);
 
 			const { cellules } = useGridStore.getState();
-			expect(cellules[0][0].type).toBe("start");
-			expect(cellules[1][1].type).toBe("end");
+			expect(cellules[0][0].state).toBe("start");
+			expect(cellules[1][1].state).toBe("end");
 		});
 
 		it("should toggle wall when start and end exist", () => {
 			const { updateCell } = useGridStore.getState();
-			const startCell: Cellule = { x: 0, y: 0, type: "empty" };
-			const endCell: Cellule = { x: 1, y: 1, type: "empty" };
-			const wallCell: Cellule = { x: 2, y: 2, type: "empty" };
+			const startCell: Cellule = { x: 0, y: 0, state: "empty" };
+			const endCell: Cellule = { x: 1, y: 1, state: "empty" };
+			const wallCell: Cellule = { x: 2, y: 2, state: "empty" };
 
 			updateCell(startCell);
 			updateCell(endCell);
 			updateCell(wallCell);
 
 			const { cellules } = useGridStore.getState();
-			expect(cellules[2][2].type).toBe("wall");
+			expect(cellules[2][2].state).toBe("wall");
 		});
 
 		it("should remove start when clicking on it", () => {
 			const { updateCell } = useGridStore.getState();
-			const startCell: Cellule = { x: 0, y: 0, type: "empty" };
+			const startCell: Cellule = { x: 0, y: 0, state: "empty" };
 
 			updateCell(startCell);
-			expect(useGridStore.getState().cellules[0][0].type).toBe("start");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("start");
 
-			updateCell({ x: 0, y: 0, type: "start" });
-			expect(useGridStore.getState().cellules[0][0].type).toBe("empty");
+			updateCell({ x: 0, y: 0, state: "start" });
+			expect(useGridStore.getState().cellules[0][0].state).toBe("empty");
 		});
 
 		it("should remove end when clicking on it", () => {
 			const { updateCell } = useGridStore.getState();
-			const startCell: Cellule = { x: 0, y: 0, type: "empty" };
-			const endCell: Cellule = { x: 1, y: 1, type: "empty" };
+			const startCell: Cellule = { x: 0, y: 0, state: "empty" };
+			const endCell: Cellule = { x: 1, y: 1, state: "empty" };
 
 			updateCell(startCell);
 			updateCell(endCell);
-			expect(useGridStore.getState().cellules[1][1].type).toBe("end");
+			expect(useGridStore.getState().cellules[1][1].state).toBe("end");
 
-			updateCell({ x: 1, y: 1, type: "end" });
-			expect(useGridStore.getState().cellules[1][1].type).toBe("empty");
+			updateCell({ x: 1, y: 1, state: "end" });
+			expect(useGridStore.getState().cellules[1][1].state).toBe("empty");
 		});
 
 		it("should toggle wall back to empty", () => {
 			const { updateCell } = useGridStore.getState();
-			const startCell: Cellule = { x: 0, y: 0, type: "empty" };
-			const endCell: Cellule = { x: 1, y: 1, type: "empty" };
-			const wallCell: Cellule = { x: 2, y: 2, type: "empty" };
+			const startCell: Cellule = { x: 0, y: 0, state: "empty" };
+			const endCell: Cellule = { x: 1, y: 1, state: "empty" };
+			const wallCell: Cellule = { x: 2, y: 2, state: "empty" };
 
 			updateCell(startCell);
 			updateCell(endCell);
 			updateCell(wallCell);
-			expect(useGridStore.getState().cellules[2][2].type).toBe("wall");
+			expect(useGridStore.getState().cellules[2][2].state).toBe("wall");
 
-			updateCell({ x: 2, y: 2, type: "wall" });
-			expect(useGridStore.getState().cellules[2][2].type).toBe("empty");
+			updateCell({ x: 2, y: 2, state: "wall" });
+			expect(useGridStore.getState().cellules[2][2].state).toBe("empty");
 		});
 	});
 
@@ -197,15 +197,15 @@ describe("GridStore", () => {
 		it("should update multiple cells at once", () => {
 			const { updateCell } = useGridStore.getState();
 			const cells: Cellule[] = [
-				{ x: 0, y: 0, type: "empty" },
-				{ x: 1, y: 1, type: "empty" },
+				{ x: 0, y: 0, state: "empty" },
+				{ x: 1, y: 1, state: "empty" },
 			];
 
 			updateCell(cells);
 
 			const { cellules } = useGridStore.getState();
-			expect(cellules[0][0].type).toBe("start");
-			expect(cellules[1][1].type).toBe("end");
+			expect(cellules[0][0].state).toBe("start");
+			expect(cellules[1][1].state).toBe("end");
 		});
 
 		it("should handle empty array without error", () => {
@@ -222,7 +222,7 @@ describe("GridStore", () => {
 	describe("updateCell - History management", () => {
 		it("should add to history on default update", () => {
 			const { updateCell } = useGridStore.getState();
-			const cell: Cellule = { x: 0, y: 0, type: "empty" };
+			const cell: Cellule = { x: 0, y: 0, state: "empty" };
 
 			updateCell(cell);
 
@@ -233,13 +233,13 @@ describe("GridStore", () => {
 		it("should clear future on new update", () => {
 			const { updateCell, undo } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
-			updateCell({ x: 1, y: 1, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
+			updateCell({ x: 1, y: 1, state: "empty" });
 			undo();
 
 			expect(useGridStore.getState().future.length).toBe(1);
 
-			updateCell({ x: 2, y: 2, type: "empty" });
+			updateCell({ x: 2, y: 2, state: "empty" });
 			expect(useGridStore.getState().future).toEqual([]);
 		});
 	});
@@ -247,7 +247,7 @@ describe("GridStore", () => {
 	describe("updateCell - Drag mode (commitHistory = false)", () => {
 		it("should not commit to history on first drag cell", () => {
 			const { updateCell } = useGridStore.getState();
-			const cell: Cellule = { x: 0, y: 0, type: "empty" };
+			const cell: Cellule = { x: 0, y: 0, state: "empty" };
 
 			updateCell(cell, false);
 
@@ -259,9 +259,9 @@ describe("GridStore", () => {
 		it("should accumulate cells in tempCellules during drag", () => {
 			const { updateCell } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" }, false);
-			updateCell({ x: 1, y: 1, type: "empty" }, false);
-			updateCell({ x: 2, y: 2, type: "empty" }, false);
+			updateCell({ x: 0, y: 0, state: "empty" }, false);
+			updateCell({ x: 1, y: 1, state: "empty" }, false);
+			updateCell({ x: 2, y: 2, state: "empty" }, false);
 
 			const { tempCellules } = useGridStore.getState();
 			expect(tempCellules?.length).toBe(3);
@@ -270,8 +270,8 @@ describe("GridStore", () => {
 		it("should finalize drag and clear tempCellules on commit", () => {
 			const { updateCell } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" }, false);
-			updateCell({ x: 1, y: 1, type: "empty" }, false);
+			updateCell({ x: 0, y: 0, state: "empty" }, false);
+			updateCell({ x: 1, y: 1, state: "empty" }, false);
 			updateCell([], true);
 
 			const { tempCellules } = useGridStore.getState();
@@ -283,9 +283,9 @@ describe("GridStore", () => {
 
 			const initialHistory = useGridStore.getState().history.length;
 
-			updateCell({ x: 0, y: 0, type: "empty" }, false);
-			updateCell({ x: 1, y: 1, type: "empty" }, false);
-			updateCell({ x: 2, y: 2, type: "empty" }, false);
+			updateCell({ x: 0, y: 0, state: "empty" }, false);
+			updateCell({ x: 1, y: 1, state: "empty" }, false);
+			updateCell({ x: 2, y: 2, state: "empty" }, false);
 			updateCell([], true);
 
 			const finalHistory = useGridStore.getState().history.length;
@@ -296,7 +296,7 @@ describe("GridStore", () => {
 	describe("updateCell - Immediate commit (commitHistory = true)", () => {
 		it("should commit immediately with commitHistory = true", () => {
 			const { updateCell } = useGridStore.getState();
-			const cell: Cellule = { x: 0, y: 0, type: "empty" };
+			const cell: Cellule = { x: 0, y: 0, state: "empty" };
 
 			updateCell(cell, true);
 
@@ -309,13 +309,13 @@ describe("GridStore", () => {
 	describe("undo", () => {
 		it("should undo the last cell update", () => {
 			const { updateCell, undo } = useGridStore.getState();
-			const cell: Cellule = { x: 0, y: 0, type: "empty" };
+			const cell: Cellule = { x: 0, y: 0, state: "empty" };
 
 			updateCell(cell);
-			expect(useGridStore.getState().cellules[0][0].type).toBe("start");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("start");
 
 			undo();
-			expect(useGridStore.getState().cellules[0][0].type).toBe("empty");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("empty");
 		});
 
 		it("should do nothing when history is empty", () => {
@@ -331,7 +331,7 @@ describe("GridStore", () => {
 		it("should add to future on undo", () => {
 			const { updateCell, undo } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
 			undo();
 
 			const { future } = useGridStore.getState();
@@ -341,16 +341,16 @@ describe("GridStore", () => {
 		it("should handle multiple undos", () => {
 			const { updateCell, undo } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
-			updateCell({ x: 1, y: 1, type: "empty" });
-			updateCell({ x: 2, y: 2, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
+			updateCell({ x: 1, y: 1, state: "empty" });
+			updateCell({ x: 2, y: 2, state: "empty" });
 
 			undo();
 			undo();
 
 			const { cellules, future } = useGridStore.getState();
-			expect(cellules[0][0].type).toBe("start");
-			expect(cellules[1][1].type).toBe("empty");
+			expect(cellules[0][0].state).toBe("start");
+			expect(cellules[1][1].state).toBe("empty");
 			expect(future.length).toBe(2);
 		});
 	});
@@ -359,12 +359,12 @@ describe("GridStore", () => {
 		it("should redo the last undone action", () => {
 			const { updateCell, undo, redo } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
 			undo();
-			expect(useGridStore.getState().cellules[0][0].type).toBe("empty");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("empty");
 
 			redo();
-			expect(useGridStore.getState().cellules[0][0].type).toBe("start");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("start");
 		});
 
 		it("should do nothing when future is empty", () => {
@@ -380,17 +380,17 @@ describe("GridStore", () => {
 		it("should handle multiple redos", () => {
 			const { updateCell, undo, redo } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
-			updateCell({ x: 1, y: 1, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
+			updateCell({ x: 1, y: 1, state: "empty" });
 
 			undo();
 			undo();
 
 			redo();
-			expect(useGridStore.getState().cellules[0][0].type).toBe("start");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("start");
 
 			redo();
-			expect(useGridStore.getState().cellules[1][1].type).toBe("end");
+			expect(useGridStore.getState().cellules[1][1].state).toBe("end");
 		});
 	});
 
@@ -398,53 +398,53 @@ describe("GridStore", () => {
 		it("should handle full workflow: updates, undo, redo", () => {
 			const { updateCell, undo, redo } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
-			updateCell({ x: 1, y: 1, type: "empty" });
-			updateCell({ x: 2, y: 2, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
+			updateCell({ x: 1, y: 1, state: "empty" });
+			updateCell({ x: 2, y: 2, state: "empty" });
 
 			undo();
 			undo();
 			redo();
 
 			const { cellules } = useGridStore.getState();
-			expect(cellules[0][0].type).toBe("start");
-			expect(cellules[1][1].type).toBe("end");
-			expect(cellules[2][2].type).toBe("empty");
+			expect(cellules[0][0].state).toBe("start");
+			expect(cellules[1][1].state).toBe("end");
+			expect(cellules[2][2].state).toBe("empty");
 		});
 
 		it("should handle drag workflow with undo", () => {
 			const { updateCell, undo } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" }, false);
-			updateCell({ x: 1, y: 1, type: "empty" }, false);
-			updateCell({ x: 2, y: 2, type: "empty" }, false);
+			updateCell({ x: 0, y: 0, state: "empty" }, false);
+			updateCell({ x: 1, y: 1, state: "empty" }, false);
+			updateCell({ x: 2, y: 2, state: "empty" }, false);
 			updateCell([], true);
 
-			expect(useGridStore.getState().cellules[0][0].type).toBe("start");
-			expect(useGridStore.getState().cellules[1][1].type).toBe("end");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("start");
+			expect(useGridStore.getState().cellules[1][1].state).toBe("end");
 
 			undo();
 
-			expect(useGridStore.getState().cellules[0][0].type).toBe("empty");
-			expect(useGridStore.getState().cellules[1][1].type).toBe("empty");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("empty");
+			expect(useGridStore.getState().cellules[1][1].state).toBe("empty");
 		});
 
 		it("should prevent duplicate start cells", () => {
 			const { updateCell } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
-			updateCell({ x: 1, y: 1, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
+			updateCell({ x: 1, y: 1, state: "empty" });
 
 			// Remove end to trigger start placement logic
-			updateCell({ x: 1, y: 1, type: "end" });
-			updateCell({ x: 2, y: 2, type: "empty" });
+			updateCell({ x: 1, y: 1, state: "end" });
+			updateCell({ x: 2, y: 2, state: "empty" });
 
 			const { cellules } = useGridStore.getState();
 			let startCount = 0;
 
 			for (const row of cellules) {
 				for (const cell of row) {
-					if (cell.type === "start") startCount++;
+					if (cell.state === "start") startCount++;
 				}
 			}
 
@@ -454,20 +454,20 @@ describe("GridStore", () => {
 		it("should prevent duplicate end cells", () => {
 			const { updateCell } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
-			updateCell({ x: 1, y: 1, type: "empty" });
-			updateCell({ x: 2, y: 2, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
+			updateCell({ x: 1, y: 1, state: "empty" });
+			updateCell({ x: 2, y: 2, state: "empty" });
 
 			// Remove end and place it elsewhere
-			updateCell({ x: 1, y: 1, type: "end" });
-			updateCell({ x: 3, y: 3, type: "empty" });
+			updateCell({ x: 1, y: 1, state: "end" });
+			updateCell({ x: 3, y: 3, state: "empty" });
 
 			const { cellules } = useGridStore.getState();
 			let endCount = 0;
 
 			for (const row of cellules) {
 				for (const cell of row) {
-					if (cell.type === "end") endCount++;
+					if (cell.state === "end") endCount++;
 				}
 			}
 
@@ -480,10 +480,10 @@ describe("GridStore", () => {
 			const { updateCell, cellules } = useGridStore.getState();
 			const beforeState = cellules;
 
-			updateCell({ x: -1, y: 0, type: "empty" });
-			updateCell({ x: 0, y: -1, type: "empty" });
-			updateCell({ x: 100, y: 0, type: "empty" });
-			updateCell({ x: 0, y: 100, type: "empty" });
+			updateCell({ x: -1, y: 0, state: "empty" });
+			updateCell({ x: 0, y: -1, state: "empty" });
+			updateCell({ x: 100, y: 0, state: "empty" });
+			updateCell({ x: 0, y: 100, state: "empty" });
 
 			const afterState = useGridStore.getState().cellules;
 			expect(afterState).toEqual(beforeState);
@@ -493,12 +493,12 @@ describe("GridStore", () => {
 			const { updateCell } = useGridStore.getState();
 			const { rows, cols } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
-			updateCell({ x: cols - 1, y: rows - 1, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
+			updateCell({ x: cols - 1, y: rows - 1, state: "empty" });
 
 			const { cellules } = useGridStore.getState();
-			expect(cellules[0][0].type).toBe("start");
-			expect(cellules[rows - 1][cols - 1].type).toBe("end");
+			expect(cellules[0][0].state).toBe("start");
+			expect(cellules[rows - 1][cols - 1].state).toBe("end");
 		});
 	});
 
@@ -506,42 +506,42 @@ describe("GridStore", () => {
 		it("should prevent duplicate start cells during drag mode", () => {
 			const { updateCell } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" }, false);
-			updateCell({ x: 1, y: 1, type: "empty" }, false);
+			updateCell({ x: 0, y: 0, state: "empty" }, false);
+			updateCell({ x: 1, y: 1, state: "empty" }, false);
 			updateCell([], true);
 
 			// Remove end, then drag to place start elsewhere
-			updateCell({ x: 1, y: 1, type: "end" });
-			updateCell({ x: 2, y: 2, type: "empty" }, false);
+			updateCell({ x: 1, y: 1, state: "end" });
+			updateCell({ x: 2, y: 2, state: "empty" }, false);
 			updateCell([], true);
 
 			const { cellules } = useGridStore.getState();
 			let startCount = 0;
 			for (const row of cellules) {
 				for (const cell of row) {
-					if (cell.type === "start") startCount++;
+					if (cell.state === "start") startCount++;
 				}
 			}
 
 			expect(startCount).toBe(1);
-			expect(cellules[0][0].type).toBe("start");
+			expect(cellules[0][0].state).toBe("start");
 		});
 
 		it("should handle undo/redo with incomplete drag (no finalization)", () => {
 			const { updateCell, undo, redo } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" }, false);
-			updateCell({ x: 1, y: 1, type: "empty" }, false);
+			updateCell({ x: 0, y: 0, state: "empty" }, false);
+			updateCell({ x: 1, y: 1, state: "empty" }, false);
 			// Note: No finalization call
 
 			const { tempCellules } = useGridStore.getState();
 			expect(tempCellules).toBeDefined();
 
 			undo();
-			expect(useGridStore.getState().cellules[0][0].type).toBe("empty");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("empty");
 
 			redo();
-			expect(useGridStore.getState().cellules[0][0].type).toBe("start");
+			expect(useGridStore.getState().cellules[0][0].state).toBe("start");
 		});
 
 		it("should handle drag finalization with no tempCellules", () => {
@@ -552,27 +552,27 @@ describe("GridStore", () => {
 
 			const { tempCellules, cellules } = useGridStore.getState();
 			expect(tempCellules).toBeUndefined();
-			expect(cellules[0][0].type).toBe("empty");
+			expect(cellules[0][0].state).toBe("empty");
 		});
 
 		it("should preserve grid state when changing cell size", () => {
 			const { updateCell, setCellSize } = useGridStore.getState();
 
-			updateCell({ x: 0, y: 0, type: "empty" });
+			updateCell({ x: 0, y: 0, state: "empty" });
 			setCellSize(30);
 
 			const { cellules, cellSize } = useGridStore.getState();
 			expect(cellSize).toBe(30);
-			expect(cellules[0][0].type).toBe("start"); // State should be preserved
+			expect(cellules[0][0].state).toBe("start"); // State should be preserved
 		});
 
 		it("should maintain correct order of cells in tempCellules", () => {
 			const { updateCell } = useGridStore.getState();
 
 			const cells = [
-				{ x: 0, y: 0, type: "empty" as const },
-				{ x: 1, y: 1, type: "empty" as const },
-				{ x: 2, y: 2, type: "empty" as const },
+				{ x: 0, y: 0, state: "empty" as const },
+				{ x: 1, y: 1, state: "empty" as const },
+				{ x: 2, y: 2, state: "empty" as const },
 			];
 
 			cells.forEach((cell) => {
@@ -591,48 +591,48 @@ describe("GridStore", () => {
 			const { updateCell, clearWalls } = useGridStore.getState();
 
 			// Place some walls
-			updateCell({ x: 0, y: 0, type: "empty" });
-			updateCell({ x: 1, y: 1, type: "empty" });
-			updateCell({ x: 2, y: 2, type: "empty" }); // becomes wall
+			updateCell({ x: 0, y: 0, state: "empty" });
+			updateCell({ x: 1, y: 1, state: "empty" });
+			updateCell({ x: 2, y: 2, state: "empty" }); // becomes wall
 
 			clearWalls();
 
 			const { cellules: updated } = useGridStore.getState();
-			expect(updated[0][0].type).not.toBe("wall");
-			expect(updated[1][1].type).not.toBe("wall");
-			expect(updated[2][2].type).not.toBe("wall");
+			expect(updated[0][0].state).not.toBe("wall");
+			expect(updated[1][1].state).not.toBe("wall");
+			expect(updated[2][2].state).not.toBe("wall");
 		});
 
 		it("should clear all path and visited cells with clearPath", () => {
 			const { updateCell, clearPath } = useGridStore.getState();
 
 			// Manually set some path/visited cells
-			updateCell({ x: 0, y: 0, type: "start" }, false);
-			updateCell({ x: 1, y: 1, type: "end" }, false);
-			updateCell({ x: 2, y: 2, type: "path" }, false);
-			updateCell({ x: 3, y: 3, type: "visited" }, true);
+			updateCell({ x: 0, y: 0, state: "start" }, false);
+			updateCell({ x: 1, y: 1, state: "end" }, false);
+			updateCell({ x: 2, y: 2, state: "path" }, false);
+			updateCell({ x: 3, y: 3, state: "visited" }, true);
 
 			clearPath();
 
 			const { cellules: updated } = useGridStore.getState();
-			expect(updated[2][2].type).toBe("empty");
-			expect(updated[3][3].type).toBe("empty");
+			expect(updated[2][2].state).toBe("empty");
+			expect(updated[3][3].state).toBe("empty");
 		});
 
 		it("should reset the entire grid with resetGrid", () => {
 			const { updateCell, resetGrid } = useGridStore.getState();
 
 			// Set some special and wall cells
-			updateCell({ x: 0, y: 0, type: "empty" }); // start
-			updateCell({ x: 1, y: 1, type: "empty" }); // end
-			updateCell({ x: 2, y: 2, type: "empty" }); // wall
+			updateCell({ x: 0, y: 0, state: "empty" }); // start
+			updateCell({ x: 1, y: 1, state: "empty" }); // end
+			updateCell({ x: 2, y: 2, state: "empty" }); // wall
 
 			resetGrid();
 
 			const { cellules: updated } = useGridStore.getState();
 			for (const row of updated) {
 				for (const cell of row) {
-					expect(cell.type).toBe("empty");
+					expect(cell.state).toBe("empty");
 				}
 			}
 		});

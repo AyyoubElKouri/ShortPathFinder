@@ -4,13 +4,14 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { create } from "zustand";
+import { ALGORITHMS, HeuristicType } from "@/lib/constants";
 import type { Algorithm } from "@/lib/types";
 
 export interface AlgorithmConfig {
 	allowDiagonal: boolean;
 	bidirectional: boolean;
 	dontCrossCorners: boolean;
-	heuristic?: "manhattan" | "euclidean" | "octile" | "chebyshev";
+	heuristic?: (typeof HeuristicType)[keyof typeof HeuristicType];
 }
 
 export interface AlgorithmStore {
@@ -24,32 +25,26 @@ const DEFAULT_CONFIG: AlgorithmConfig = {
 	allowDiagonal: true,
 	bidirectional: false,
 	dontCrossCorners: false,
-	heuristic: "manhattan",
+	heuristic: HeuristicType.MANHATTAN,
 };
 
-const NON_HEURISTIC_ALGOS: Algorithm[] = [
-	"Dijkstra",
-	"Breadth-First Search",
-	"Depth-First Search",
-	"Trace",
-];
+const NON_HEURISTIC_ALGOS: Algorithm[] = [ALGORITHMS[0]];
 
 export const useAlgorithmStore = create<AlgorithmStore>((set, get) => ({
-	algorithm: "A*",
+	algorithm: ALGORITHMS[0],
 	config: DEFAULT_CONFIG,
 
 	setAlgorithm: (algorithm) => {
 		const isNonHeuristic = NON_HEURISTIC_ALGOS.includes(algorithm);
 
-		set(() => ({
-			algorithm,
-			config: {
-				...get().config,
-				heuristic: isNonHeuristic
-					? undefined
-					: (get().config.heuristic ?? "manhattan"),
-			},
-		}));
+		const newConfig = { ...get().config };
+		if (isNonHeuristic) {
+			delete newConfig.heuristic;
+		} else if (!newConfig.heuristic) {
+			newConfig.heuristic = DEFAULT_CONFIG.heuristic;
+		}
+
+		set({ algorithm, config: newConfig });
 	},
 
 	setConfig: (config) => {

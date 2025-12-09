@@ -5,13 +5,8 @@
 
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { CELL_SIZE, GRID_COLS, GRID_ROWS } from "@/lib/constants";
-
-export interface Cellule {
-	x: number;
-	y: number;
-	type: "empty" | "wall" | "start" | "end" | "path" | "visited";
-}
+import { CELL_SIZE } from "@/lib/constants";
+import type { Cellule } from "@/lib/types";
 
 export interface GridStore {
 	cellSize: number;
@@ -21,6 +16,7 @@ export interface GridStore {
 	history: Cellule[][][];
 	future: Cellule[][][];
 	tempCellules?: Cellule[];
+	isRunning: boolean;
 
 	setCellSize: (size: number) => void;
 	setRows: (rows: number) => void;
@@ -31,6 +27,7 @@ export interface GridStore {
 	resetGrid: () => void;
 	generateMaze: () => void;
 	readyToRun: () => void;
+	setIsRunning: (running: boolean) => void;
 	undo: () => void;
 	redo: () => void;
 }
@@ -40,11 +37,12 @@ export const useGridStore = create<GridStore>()(
 		(set, get) => ({
 			// Initial state
 			cellSize: CELL_SIZE,
-			rows: GRID_ROWS,
-			cols: GRID_COLS,
-			cellules: createInitialGrid(GRID_ROWS, GRID_COLS),
-			history: [createInitialGrid(GRID_ROWS, GRID_COLS)],
+			rows: 30,
+			cols: 50,
+			cellules: createInitialGrid(30, 50),
+			history: [createInitialGrid(30, 50)],
 			future: [],
+			isRunning: false,
 
 			// Actions
 			setCellSize: (size: number) => {
@@ -69,6 +67,10 @@ export const useGridStore = create<GridStore>()(
 					history: [],
 					future: [],
 				});
+			},
+
+			setIsRunning: (running: boolean) => {
+				set({ isRunning: running });
 			},
 
 			updateCell: (cells: Cellule | Cellule[], commitHistory?: boolean) => {
@@ -135,8 +137,8 @@ export const useGridStore = create<GridStore>()(
 
 				for (const row of newGrid) {
 					for (const cell of row) {
-						if (cell.type === "wall") {
-							cell.type = "empty";
+						if (cell.state === "wall") {
+							cell.state = "empty";
 							modified = true;
 						}
 					}
@@ -159,8 +161,8 @@ export const useGridStore = create<GridStore>()(
 
 				for (const row of newGrid) {
 					for (const cell of row) {
-						if (cell.type === "path" || cell.type === "visited") {
-							cell.type = "empty";
+						if (cell.state === "path" || cell.state === "visited") {
+							cell.state = "empty";
 							modified = true;
 						}
 					}
@@ -188,8 +190,8 @@ export const useGridStore = create<GridStore>()(
 				// Initialize all cells as walls (except start/end)
 				for (const row of newGrid) {
 					for (const cell of row) {
-						if (cell.type !== "start" && cell.type !== "end") {
-							cell.type = "wall";
+						if (cell.state !== "start" && cell.state !== "end") {
+							cell.state = "wall";
 						}
 					}
 				}
@@ -231,10 +233,10 @@ export const useGridStore = create<GridStore>()(
 
 					// Mark current cell as passage
 					if (
-						newGrid[y][x].type !== "start" &&
-						newGrid[y][x].type !== "end"
+						newGrid[y][x].state !== "start" &&
+						newGrid[y][x].state !== "end"
 					) {
-						newGrid[y][x].type = "empty";
+						newGrid[y][x].state = "empty";
 					}
 
 					// Randomize direction order
@@ -257,10 +259,10 @@ export const useGridStore = create<GridStore>()(
 							const wallY = y + dir.dy / 2;
 
 							if (
-								newGrid[wallY][wallX].type !== "start" &&
-								newGrid[wallY][wallX].type !== "end"
+								newGrid[wallY][wallX].state !== "start" &&
+								newGrid[wallY][wallX].state !== "end"
 							) {
-								newGrid[wallY][wallX].type = "empty";
+								newGrid[wallY][wallX].state = "empty";
 							}
 
 							// Recursively carve from next cell
@@ -282,7 +284,7 @@ export const useGridStore = create<GridStore>()(
 
 				// Make sure start and end positions are passages
 				if (start) {
-					newGrid[start.y][start.x].type = "start";
+					newGrid[start.y][start.x].state = "start";
 					// Clear around start if needed
 					for (const dir of [
 						{ dx: 0, dy: -1 },
@@ -294,16 +296,16 @@ export const useGridStore = create<GridStore>()(
 						const ny = start.y + dir.dy;
 						if (
 							isWithinBounds(nx, ny, newGrid) &&
-							newGrid[ny][nx].type === "wall" &&
+							newGrid[ny][nx].state === "wall" &&
 							seededRandom() > 0.5
 						) {
-							newGrid[ny][nx].type = "empty";
+							newGrid[ny][nx].state = "empty";
 						}
 					}
 				}
 
 				if (end) {
-					newGrid[end.y][end.x].type = "end";
+					newGrid[end.y][end.x].state = "end";
 					// Clear around end if needed
 					for (const dir of [
 						{ dx: 0, dy: -1 },
@@ -315,10 +317,10 @@ export const useGridStore = create<GridStore>()(
 						const ny = end.y + dir.dy;
 						if (
 							isWithinBounds(nx, ny, newGrid) &&
-							newGrid[ny][nx].type === "wall" &&
+							newGrid[ny][nx].state === "wall" &&
 							seededRandom() > 0.5
 						) {
-							newGrid[ny][nx].type = "empty";
+							newGrid[ny][nx].state = "empty";
 						}
 					}
 				}
@@ -333,7 +335,7 @@ export const useGridStore = create<GridStore>()(
 				for (let y = 1; y < rows - 1; y++) {
 					for (let x = 1; x < cols - 1; x++) {
 						if (
-							newGrid[y][x].type === "wall" &&
+							newGrid[y][x].state === "wall" &&
 							seededRandom() < openingChance
 						) {
 							// Check if removing this wall doesn't create 2x2 empty spaces
@@ -348,7 +350,7 @@ export const useGridStore = create<GridStore>()(
 								const ny = y + dir.dy;
 								if (
 									isWithinBounds(nx, ny, newGrid) &&
-									newGrid[ny][nx].type === "empty"
+									newGrid[ny][nx].state === "empty"
 								) {
 									emptyNeighbors++;
 								}
@@ -356,7 +358,7 @@ export const useGridStore = create<GridStore>()(
 
 							// Only remove wall if it has 2 or fewer empty neighbors
 							if (emptyNeighbors <= 2) {
-								newGrid[y][x].type = "empty";
+								newGrid[y][x].state = "empty";
 							}
 						}
 					}
@@ -370,20 +372,20 @@ export const useGridStore = create<GridStore>()(
 			},
 
 			readyToRun: () => {
-				
 				const { cellules } = get();
 
 				// Check if the grid is valid (contains start, end cells)
-				const {start, end} = findSpecialCells(cellules);
-				if(!start || !end) throw new Error("Start or End cell are not provided");
+				const { start, end } = findSpecialCells(cellules);
+				if (!start || !end)
+					throw new Error("Start or End cell are not provided");
 
 				const newGrid = deepCopyGrid(cellules);
 				let modified = false;
 
 				for (const row of newGrid) {
 					for (const cell of row) {
-						if (cell.type === "path" || cell.type === "visited") {
-							cell.type = "empty";
+						if (cell.state === "path" || cell.state === "visited") {
+							cell.state = "empty";
 							modified = true;
 						}
 					}
@@ -404,7 +406,7 @@ export const useGridStore = create<GridStore>()(
 
 				for (const row of newGrid) {
 					for (const cell of row) {
-						cell.type = "empty";
+						cell.state = "empty";
 					}
 				}
 
@@ -462,7 +464,7 @@ function createInitialGrid(rows: number, cols: number): Cellule[][] {
 		Array.from({ length: cols }, (_, x) => ({
 			x,
 			y,
-			type: "empty" as const,
+			state: "empty" as const,
 		})),
 	);
 }
@@ -480,8 +482,8 @@ function findSpecialCells(grid: Cellule[][]): {
 
 	for (const row of grid) {
 		for (const cell of row) {
-			if (cell.type === "start") start = cell;
-			if (cell.type === "end") end = cell;
+			if (cell.state === "start") start = cell;
+			if (cell.state === "end") end = cell;
 		}
 	}
 
@@ -494,30 +496,30 @@ function isWithinBounds(x: number, y: number, grid: Cellule[][]): boolean {
 
 function removeOtherSpecialCells(
 	grid: Cellule[][],
-	type: "start" | "end",
+	state: "start" | "end",
 	exceptX: number,
 	exceptY: number,
 ): void {
 	for (const row of grid) {
 		for (const c of row) {
-			if (c.type === type && (c.x !== exceptX || c.y !== exceptY)) {
-				c.type = "empty";
+			if (c.state === state && (c.x !== exceptX || c.y !== exceptY)) {
+				c.state = "empty";
 			}
 		}
 	}
 }
 
-function determineNewCellType(
+function determineNewCellState(
 	currentCell: Cellule,
 	start: Cellule | null,
 	end: Cellule | null,
-	passedType?: Cellule["type"],
-): Cellule["type"] {
-	if (passedType === "path" || passedType === "visited") {
-		return passedType;
+	passedstate?: Cellule["state"],
+): Cellule["state"] {
+	if (passedstate === "path" || passedstate === "visited") {
+		return passedstate;
 	}
 
-	if (currentCell.type === "start" || currentCell.type === "end") {
+	if (currentCell.state === "start" || currentCell.state === "end") {
 		return "empty";
 	}
 
@@ -529,7 +531,7 @@ function determineNewCellType(
 		return "end";
 	}
 
-	return currentCell.type === "wall" ? "empty" : "wall";
+	return currentCell.state === "wall" ? "empty" : "wall";
 }
 
 function processCellUpdate(
@@ -545,15 +547,15 @@ function processCellUpdate(
 
 	const currentCell = grid[y][x];
 	const { start, end } = getSpecials();
-	const newType = determineNewCellType(currentCell, start, end, cell.type);
+	const newState = determineNewCellState(currentCell, start, end, cell.state);
 
-	if (newType === "start") {
+	if (newState === "start") {
 		removeOtherSpecialCells(grid, "start", x, y);
-	} else if (newType === "end") {
+	} else if (newState === "end") {
 		removeOtherSpecialCells(grid, "end", x, y);
 	}
 
-	grid[y][x].type = newType;
+	grid[y][x].state = newState;
 }
 
 function shouldFinalizeDrag(
@@ -663,7 +665,7 @@ function ensurePathExists(
 			if (
 				isWithinBounds(nx, ny, grid) &&
 				!visited[ny][nx] &&
-				grid[ny][nx].type !== "wall"
+				grid[ny][nx].state !== "wall"
 			) {
 				visited[ny][nx] = true;
 				queue.push({ x: nx, y: ny });
@@ -686,8 +688,8 @@ function ensurePathExists(
 			else if (cx > end.x) cx--;
 
 			// Clear the cell if it's a wall
-			if (grid[cy][cx].type === "wall") {
-				grid[cy][cx].type = "empty";
+			if (grid[cy][cx].state === "wall") {
+				grid[cy][cx].state = "empty";
 			}
 		}
 	}

@@ -4,23 +4,17 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { useGrid } from "@/hooks/useGrid";
+import { getCellColor } from "@/lib/utils";
 
 export function Grid() {
-	const {
-		cellules,
-		cellSize,
-		handleMouseDown,
-		handleMouseEnter,
-		handleMouseUp,
-		getCellColor,
-	} = useGrid();
+	const { cellules, cellSize, handlers } = useGrid();
 
 	return (
 		<button
 			type="button"
 			className="relative"
 			style={{ userSelect: "none", display: "inline-block" }}
-			onMouseLeave={handleMouseUp}
+			onMouseLeave={handlers.mouseUp}
 		>
 			{/* Grid Container */}
 			<button
@@ -30,7 +24,7 @@ export function Grid() {
 					gridTemplateRows: `repeat(${cellules.length}, ${cellSize}px)`,
 					gridTemplateColumns: `repeat(${cellules[0].length}, ${cellSize}px)`,
 				}}
-				onMouseUp={handleMouseUp}
+				onMouseUp={handlers.mouseUp}
 			>
 				{cellules.flat().map((cell) => {
 					const rows = cellules.length;
@@ -40,10 +34,10 @@ export function Grid() {
 					const isLastCol = cell.x === cols - 1;
 
 					const baseColor = ["empty", "visited", "path"].includes(
-						cell.type,
+						cell.state,
 					)
 						? "#2C252C"
-						: getCellColor(cell);
+						: getCellColor(cell.state);
 
 					const borderStyles: React.CSSProperties = {
 						borderTop: `0.5px solid ${baseColor}`,
@@ -64,13 +58,13 @@ export function Grid() {
 							style={{
 								width: cellSize,
 								height: cellSize,
-								backgroundColor: getCellColor(cell),
+								backgroundColor: getCellColor(cell.state),
 								boxSizing: "border-box",
 								transition: "background-color 0.2s ease",
 								...borderStyles,
 							}}
-							onMouseDown={() => handleMouseDown(cell)}
-							onMouseEnter={() => handleMouseEnter(cell)}
+							onMouseDown={() => handlers.mouseDown(cell)}
+							onMouseEnter={() => handlers.mouseEnter(cell)}
 						/>
 					);
 				})}

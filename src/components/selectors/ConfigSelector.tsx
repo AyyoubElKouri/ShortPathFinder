@@ -6,14 +6,15 @@
 import { Settings2 } from "lucide-react";
 import { useState } from "react";
 
-import { useAlgorithmStore } from "@/store/useAlgorithmStore";
-import { Switcher } from "../ui/Switcher";
-import { Seperator } from "../ui/Seperator";
-import { Button } from "../ui/Button";
+import { Button } from "@/components//ui/Button";
+import { Seperator } from "@/components//ui/Seperator";
+import { Switcher } from "@/components//ui/Switcher";
+import { useAlgorithm } from "@/hooks/useAlgorithm";
 
 export function ConfigSelector() {
 	const [open, setOpen] = useState(false);
-	const { config, setConfig } = useAlgorithmStore();
+
+	const { config, setConfig } = useAlgorithm();
 
 	return (
 		<div className="relative flex flex-col items-center">
@@ -27,7 +28,10 @@ export function ConfigSelector() {
 			</div>
 
 			{open && (
-				<div className="absolute bottom-11 w-60 px-2 bg-[#383939] border border-white/10 rounded-md overflow-hidden z-20">
+				<div
+					className="absolute bottom-11 w-60 px-2 bg-[#383939] border border-white/10
+								  rounded-md overflow-hidden z-20"
+				>
 					<div className="w-full h-8 flex justify-between items-center text-white">
 						Don't Cross Corners
 						<Switcher

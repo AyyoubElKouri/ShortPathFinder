@@ -6,15 +6,13 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Frequency, Synth, start } from "tone";
 
-import { useWebAssembly } from "@/hooks/useWebAssembly";
+import { useWasm } from "@/hooks/useWasm";
 import { BATCH_SIZE } from "@/lib/constants";
 import useGridStore from "@/store/useGridStore";
-import useRunStore from "@/store/useRunStore";
 
 export function useRun() {
-	const { runPathfinding } = useWebAssembly();
-	const { readyToRun } = useGridStore();
-	const { setIsRunning } = useRunStore();
+	const { readyToRun, setIsRunning } = useGridStore();
+	const { runPathfinding } = useWasm();
 
 	const synthRef = useRef<Synth | null>(null);
 	const bassRef = useRef<Synth | null>(null);
@@ -65,32 +63,32 @@ export function useRun() {
 
 		const animateBatch = async (
 			cells: number[],
-			type: "visited" | "path",
+			state: "visited" | "path",
 		) => {
 			for (let i = 0; i < cells.length; i += BATCH_SIZE) {
 				const batch = cells.slice(i, i + BATCH_SIZE);
 
-				useGridStore.setState((state) => {
-					const newGrid = state.cellules.map((row) =>
+				useGridStore.setState((gridState) => {
+					const newGrid = gridState.cellules.map((row) =>
 						row.map((cell) => ({ ...cell })),
 					);
 
 					batch.forEach((index) => {
 						const x = index % cols;
 						const y = Math.floor(index / cols);
-						const currentType = newGrid[y][x].type;
-						if (currentType !== "start" && currentType !== "end") {
-							newGrid[y][x].type = type;
+						const currentState = newGrid[y][x].state;
+						if (currentState !== "start" && currentState !== "end") {
+							newGrid[y][x].state = state;
 						}
 					});
 
 					return { cellules: newGrid };
 				});
 
-				if (type === "visited") {
+				if (state === "visited") {
 					const note = Frequency(400 + i * 2, "hz").toNote();
 					synthRef.current?.triggerAttackRelease(note, "32n");
-				} else if (type === "path") {
+				} else if (state === "path") {
 					const note = Frequency(200 + i * 1, "hz").toNote();
 					bassRef.current?.triggerAttackRelease(note, "16n");
 				}

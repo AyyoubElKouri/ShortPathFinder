@@ -4,18 +4,12 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { useCallback } from "react";
-import { useGridStore } from "@/store/useGridStore";
+import type { PathfindingResult } from "@/lib/types";
 import { useAlgorithmStore } from "@/store/useAlgorithmStore";
+import { useGridStore } from "@/store/useGridStore";
 import PathfindingModule from "@/wasm/pathfinding";
 
-export interface PathfindingResult {
-	visited: number[];
-	path: number[];
-	success: boolean;
-	cost: number;
-}
-
-export function useWebAssembly() {
+export function useWasm() {
 	const { cellules, rows, cols } = useGridStore();
 	const { algorithm, config } = useAlgorithmStore();
 
@@ -23,35 +17,14 @@ export function useWebAssembly() {
 		useCallback(async (): Promise<PathfindingResult | null> => {
 			const Module = await PathfindingModule();
 
-			const ALGO_NAME_MAP: Record<string, keyof typeof Module.Algorithm> = {
-				"A*": "ASTAR",
-				"IDA*": "IDASTAR",
-				Dijkstra: "DIJKSTRA",
-				"Breadth-First Search": "BFS",
-				"Depth-First Search": "DFS",
-				"Jump Point": "JUMPPOINT",
-				"Orthogonal Jump Point": "ORTHOGONALJUMPPOINT",
-				Trace: "TRACE",
-			};
-
-			const HEURISTIC_NAME_MAP: Record<
-				string,
-				keyof typeof Module.Heuristic
-			> = {
-				manhattan: "MANHATTAN",
-				euclidean: "EUCLIDEAN",
-				octile: "OCTILE",
-				chebyshev: "CHEBYSHEV",
-			};
-
 			// Find start and end cells
-			const startCell = cellules.flat().find((c) => c.type === "start");
-			const endCell = cellules.flat().find((c) => c.type === "end");
+			const startCell = cellules.flat().find((c) => c.state === "start");
+			const endCell = cellules.flat().find((c) => c.state === "end");
 			if (!startCell || !endCell) return null;
 
 			const flatGrid = cellules
 				.flat()
-				.map((c) => (c.type === "wall" ? 1 : 0));
+				.map((c) => (c.state === "wall" ? 1 : 0));
 			const gridVector = new Module.VectorUint8();
 			flatGrid.forEach((v) => {
 				gridVector.push_back(v);
@@ -63,12 +36,12 @@ export function useWebAssembly() {
 			input.cols = cols;
 			input.startIndex = startCell.y * cols + startCell.x;
 			input.endIndex = endCell.y * cols + endCell.x;
-			input.algorithm = Module.Algorithm[ALGO_NAME_MAP[algorithm]];
+			input.algorithm = Module.Algorithm[algorithm.value];
 			input.allowDiagonal = !!config.allowDiagonal;
 			input.bidirectional = !!config.bidirectional;
 			input.dontCrossCorners = !!config.dontCrossCorners;
 			input.heuristic = config.heuristic
-				? Module.Heuristic[HEURISTIC_NAME_MAP[config.heuristic]]
+				? Module.Heuristic[config.heuristic]
 				: Module.Heuristic.MANHATTAN;
 
 			const engine = new Module.PathfindingEngine();
@@ -91,4 +64,3 @@ export function useWebAssembly() {
 
 	return { runPathfinding };
 }
-
