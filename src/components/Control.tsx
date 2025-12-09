@@ -10,7 +10,7 @@ import {
 	Play,
 	RotateCcw,
 	Route,
-	Settings,
+	// Settings,
 } from "lucide-react";
 import { AlgoSelector } from "@/components/selectors/AlgoSelector";
 import { ConfigSelector } from "@/components/selectors/ConfigSelector";
