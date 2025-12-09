@@ -3,13 +3,25 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-import type { ALGORITHMS, HEURISTICS } from "./constants";
-
 // Different algorithms available for pathfinding
-export type Algorithm = (typeof ALGORITHMS)[number];
+export enum Algorithm {
+	// ASTAR,
+	// IDASTAR,
+	DIJKSTRA,
+	BFS,
+	// DFS,
+	// JUMPPOINT,
+	// ORTHOGONALJUMPPOINT,
+	// TRACE,
+}
 
 // Diffentent heuristics available for pathfinding
-export type Heuristic = (typeof HEURISTICS)[number];
+export enum Heuristic {
+	MANHATTAN,
+	EUCLIDEAN,
+	OCTILE,
+	CHEBYSHEV,
+}
 
 // Different states a cell can have
 export type CellState = "empty" | "start" | "end" | "wall" | "path" | "visited";

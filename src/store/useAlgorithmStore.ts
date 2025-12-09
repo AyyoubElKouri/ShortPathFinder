@@ -4,14 +4,14 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { create } from "zustand";
-import { ALGORITHMS, HeuristicType } from "@/lib/constants";
-import type { Algorithm } from "@/lib/types";
+import { Algorithm, Heuristic } from "@/lib/types";
+import { NON_HEURISTIC_ALGOS } from "@/lib/constants";
 
 export interface AlgorithmConfig {
 	allowDiagonal: boolean;
 	bidirectional: boolean;
 	dontCrossCorners: boolean;
-	heuristic?: (typeof HeuristicType)[keyof typeof HeuristicType];
+	heuristic?: Heuristic;
 }
 
 export interface AlgorithmStore {
@@ -25,13 +25,11 @@ const DEFAULT_CONFIG: AlgorithmConfig = {
 	allowDiagonal: true,
 	bidirectional: false,
 	dontCrossCorners: false,
-	heuristic: HeuristicType.MANHATTAN,
+	heuristic: Heuristic.MANHATTAN,
 };
 
-const NON_HEURISTIC_ALGOS: Algorithm[] = [ALGORITHMS[0]];
-
 export const useAlgorithmStore = create<AlgorithmStore>((set, get) => ({
-	algorithm: ALGORITHMS[0],
+	algorithm: Algorithm.DIJKSTRA,
 	config: DEFAULT_CONFIG,
 
 	setAlgorithm: (algorithm) => {

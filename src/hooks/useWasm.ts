@@ -5,13 +5,14 @@
 
 import { useCallback } from "react";
 import type { PathfindingResult } from "@/lib/types";
-import { useAlgorithmStore } from "@/store/useAlgorithmStore";
 import { useGridStore } from "@/store/useGridStore";
 import PathfindingModule from "@/wasm/pathfinding";
+import { toWasmAlgorithm, toWasmHeuristic } from "@/lib/utils";
+import { useAlgorithm } from "@/hooks/useAlgorithm";
 
 export function useWasm() {
 	const { cellules, rows, cols } = useGridStore();
-	const { algorithm, config } = useAlgorithmStore();
+	const { algorithm, config } = useAlgorithm();
 
 	const runPathfinding =
 		useCallback(async (): Promise<PathfindingResult | null> => {
@@ -36,12 +37,13 @@ export function useWasm() {
 			input.cols = cols;
 			input.startIndex = startCell.y * cols + startCell.x;
 			input.endIndex = endCell.y * cols + endCell.x;
-			input.algorithm = Module.Algorithm[algorithm.value];
+			input.algorithm = toWasmAlgorithm(Module, algorithm);
+
 			input.allowDiagonal = !!config.allowDiagonal;
 			input.bidirectional = !!config.bidirectional;
 			input.dontCrossCorners = !!config.dontCrossCorners;
 			input.heuristic = config.heuristic
-				? Module.Heuristic[config.heuristic]
+				? toWasmHeuristic(Module, config.heuristic)
 				: Module.Heuristic.MANHATTAN;
 
 			const engine = new Module.PathfindingEngine();

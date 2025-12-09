@@ -3,44 +3,7 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-// Algorithms supported by the pathfinding visualizer
-export enum AlgorithmType {
-	ASTAR = "ASTAR",
-	IDASTAR = "IDASTAR",
-	DIJKSTRA = "DIJKSTRA",
-	BFS = "BFS",
-	DFS = "DFS",
-	JUMPPOINT = "JUMPPOINT",
-	ORTHOGONALJUMPPOINT = "ORTHOGONALJUMPPOINT",
-	TRACE = "TRACE",
-}
-
-// List of algorithms with display names for UI
-export const ALGORITHMS = [
-	{ display: "A*", value: AlgorithmType.ASTAR },
-	{ display: "IDA*", value: AlgorithmType.IDASTAR },
-	{ display: "Dijkstra", value: AlgorithmType.DIJKSTRA },
-	{ display: "Breadth-First Search", value: AlgorithmType.BFS },
-	{ display: "Depth-First Search", value: AlgorithmType.DFS },
-	{ display: "Jump Point", value: AlgorithmType.JUMPPOINT },
-	{ display: "Orthogonal Jump Point", value: AlgorithmType.ORTHOGONALJUMPPOINT },
-	{ display: "Trace", value: AlgorithmType.TRACE },
-] as const;
-
-// Heuristics supported by the pathfinding visualizer
-export enum HeuristicType {
-  MANHATTAN = "MANHATTAN",
-  EUCLIDEAN = "EUCLIDEAN",
-  OCTILE = "OCTILE",
-  CHEBYSHEV = "CHEBYSHEV",
-}
-
-export const HEURISTICS = [
-	{ display: "Manhattan", value: HeuristicType.MANHATTAN },
-	{ display: "Euclidean", value: HeuristicType.EUCLIDEAN },
-	{ display: "Octile", value: HeuristicType.OCTILE },
-	{ display: "Chebyshev", value: HeuristicType.CHEBYSHEV },
-] as const;
+import { Algorithm } from "./types";
 
 // Size of each cell in the grid (in pixels)
 export const CELL_SIZE = 25;
@@ -57,3 +20,11 @@ export const CELL_COLORS = {
 	path: "#FAFA03",
 	visited: "#1474FF",
 };
+
+// Non heuristic algorithms
+export const NON_HEURISTIC_ALGOS: Algorithm[] = [
+	Algorithm.DIJKSTRA,
+	Algorithm.BFS,
+	// Algorithm.DFS,
+	// Algorithm.TRACE,
+];
