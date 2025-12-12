@@ -28,7 +28,7 @@ export function SplashScreen() {
 			initial={{ opacity: 1 }}
 			animate={{ opacity: isVisible ? 1 : 0 }}
 			transition={{ duration: 0.6 }}
-			className="fixed inset-0 z-50 flex items-center justify-center bg-[#141114]"
+			className="fixed inset-0 z-50 flex items-center justify-center bg-none"
 			style={{ pointerEvents: isVisible ? "auto" : "none" }}
 		>
 			<motion.div

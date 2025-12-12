@@ -3,54 +3,28 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-import { useCallback, useEffect, useRef } from "react";
-import { Frequency, Synth, start } from "tone";
+import { useCallback } from "react";
 
 import { useWasm } from "@/hooks/useWasm";
+import { useSound } from "@/hooks/useSound";
 import { BATCH_SIZE } from "@/lib/constants";
 import useGridStore from "@/store/useGridStore";
 
 export function useRun() {
 	const { readyToRun, setIsRunning } = useGridStore();
 	const { runPathfinding } = useWasm();
-
-	const synthRef = useRef<Synth | null>(null);
-	const bassRef = useRef<Synth | null>(null);
-
-	useEffect(() => {
-		synthRef.current = new Synth({
-			oscillator: { type: "sine" },
-			envelope: {
-				attack: 0.001,
-				decay: 0.1,
-				sustain: 0,
-				release: 0.1,
-			},
-		}).toDestination();
-
-		bassRef.current = new Synth({
-			envelope: {
-				attack: 0.01,
-				decay: 0.2,
-				sustain: 0,
-				release: 0.2,
-			},
-		}).toDestination();
-
-		synthRef.current.volume.value = -15;
-		bassRef.current.volume.value = -10;
-
-		return () => {
-			synthRef.current?.dispose();
-			bassRef.current?.dispose();
-		};
-	}, []);
+	const {
+		initializeAudio,
+		playVisitedSound,
+		playPathSound,
+		playSuccessChord,
+	} = useSound();
 
 	const execute = useCallback(async () => {
 		readyToRun();
 		setIsRunning(true);
 
-		await start();
+		await initializeAudio();
 
 		const result = await runPathfinding();
 		if (!result) {
@@ -86,11 +60,9 @@ export function useRun() {
 				});
 
 				if (state === "visited") {
-					const note = Frequency(400 + i * 2, "hz").toNote();
-					synthRef.current?.triggerAttackRelease(note, "32n");
+					playVisitedSound(i);
 				} else if (state === "path") {
-					const note = Frequency(200 + i * 1, "hz").toNote();
-					bassRef.current?.triggerAttackRelease(note, "16n");
+					playPathSound(i);
 				}
 
 				await new Promise((resolve) => setTimeout(resolve, 50));
@@ -104,15 +76,19 @@ export function useRun() {
 		await animateBatch(path, "path");
 
 		if (path.length > 0) {
-			bassRef.current?.triggerAttackRelease("C3", "4n");
-			await new Promise((resolve) => setTimeout(resolve, 100));
-			bassRef.current?.triggerAttackRelease("E3", "4n");
-			await new Promise((resolve) => setTimeout(resolve, 100));
-			bassRef.current?.triggerAttackRelease("G3", "2n");
+			await playSuccessChord();
 		}
 
 		setIsRunning(false);
-	}, [runPathfinding, readyToRun, setIsRunning]);
+	}, [
+		runPathfinding,
+		readyToRun,
+		setIsRunning,
+		initializeAudio,
+		playVisitedSound,
+		playPathSound,
+		playSuccessChord,
+	]);
 
 	return { execute };
 }
