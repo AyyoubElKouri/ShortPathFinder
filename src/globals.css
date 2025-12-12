@@ -98,3 +98,8 @@ body {
 *:focus {
 	outline: none;
 }
+
+body {
+	overflow-x: hidden;
+	overflow-y: hidden;
+}

@@ -4,8 +4,8 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { create } from "zustand";
-import { Algorithm, Heuristic } from "@/lib/types";
 import { NON_HEURISTIC_ALGOS } from "@/lib/constants";
+import { Algorithm, Heuristic } from "@/lib/types";
 
 export interface AlgorithmConfig {
 	allowDiagonal: boolean;

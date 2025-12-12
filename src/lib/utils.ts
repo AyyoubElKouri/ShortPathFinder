@@ -4,7 +4,7 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { CELL_COLORS } from "./constants";
-import { Algorithm, Heuristic, type CellState } from "./types";
+import { Algorithm, type CellState, Heuristic } from "./types";
 
 // Get colors for different cell types
 export function getCellColor(type: CellState): string {

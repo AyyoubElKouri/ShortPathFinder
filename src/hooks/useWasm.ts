@@ -4,11 +4,11 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { useCallback } from "react";
+import { useAlgorithm } from "@/hooks/useAlgorithm";
 import type { PathfindingResult } from "@/lib/types";
+import { toWasmAlgorithm, toWasmHeuristic } from "@/lib/utils";
 import { useGridStore } from "@/store/useGridStore";
 import PathfindingModule from "@/wasm/pathfinding";
-import { toWasmAlgorithm, toWasmHeuristic } from "@/lib/utils";
-import { useAlgorithm } from "@/hooks/useAlgorithm";
 
 export function useWasm() {
 	const { cellules, rows, cols } = useGridStore();
