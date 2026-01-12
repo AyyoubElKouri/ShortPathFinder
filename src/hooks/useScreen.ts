@@ -5,7 +5,12 @@
 
 import { useEffect, useState } from "react";
 
-export function useScreen() {
+interface ScreenReturns {
+	width: number;
+	height: number;
+}
+
+export function useScreen(): ScreenReturns {
 	const [dimensions, setDimensions] = useState({
 		width: window.innerWidth,
 		height: window.innerHeight,
@@ -28,3 +33,10 @@ export function useScreen() {
 
 	return dimensions;
 }
+
+/** 
+ 
+🌫 Lire les éléments ligne par ligne 
+🌫 Chaque valeur a sont propres 
+
+ */

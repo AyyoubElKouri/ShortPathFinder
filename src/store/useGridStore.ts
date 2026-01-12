@@ -330,7 +330,7 @@ export const useGridStore = create<GridStore>()(
 					ensurePathExists(newGrid, start, end, seededRandom);
 				}
 
-				// Add some random openings to make it less perfect (optional)
+				// Add some random openings to make it less perfect
 				const openingChance = 0.1; // 10% chance to remove some walls
 				for (let y = 1; y < rows - 1; y++) {
 					for (let x = 1; x < cols - 1; x++) {

@@ -87,6 +87,7 @@ export function useGrid(): GridReturns {
 		},
 		[isMouseDown, updateCell],
 	);
+
 	const handleMouseUp = useCallback(() => {
 		if (isMouseDown) {
 			updateCell([], true);

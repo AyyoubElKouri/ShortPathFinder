@@ -1,45 +1,37 @@
-/*--------------------------------------------------------------------------------------------------
- *                       Copyright (c) Ayyoub EL Kouri. All rights reserved
- *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
- *------------------------------------------------------------------------------------------------*/
-
 import { useEffect, useRef } from "react";
 import { Frequency, Synth, start } from "tone";
 
+// This hook provides sound effects for algorithm visualizations
 export function useSound() {
-	const synthRef = useRef<Synth | null>(null);
-	const bassRef = useRef<Synth | null>(null);
-	const isInitializedRef = useRef(false);
+	const synthRef = useRef<Synth | null>(null); // High sounds for visited nodes
+	const bassRef = useRef<Synth | null>(null); // Low sounds for path and success
+	const isInitializedRef = useRef(false); // Track if audio is ready
 
+	// Setup audio synthesizers once when component loads
 	useEffect(() => {
+		// Visited node sound - quick high beep
 		synthRef.current = new Synth({
 			oscillator: { type: "sine" },
-			envelope: {
-				attack: 0.001,
-				decay: 0.1,
-				sustain: 0,
-				release: 0.1,
-			},
+			envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 },
 		}).toDestination();
 
+		// Path sound - deeper bass tone
 		bassRef.current = new Synth({
-			envelope: {
-				attack: 0.01,
-				decay: 0.2,
-				sustain: 0,
-				release: 0.2,
-			},
+			envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 },
 		}).toDestination();
 
-		synthRef.current.volume.value = -15;
-		bassRef.current.volume.value = -10;
+		// Adjust volumes
+		synthRef.current.volume.value = -15; // Softer
+		bassRef.current.volume.value = -10; // Louder
 
+		// Cleanup on unmount
 		return () => {
 			synthRef.current?.dispose();
 			bassRef.current?.dispose();
 		};
 	}, []);
 
+	// Call this first - browser needs user permission for audio
 	const initializeAudio = async () => {
 		if (!isInitializedRef.current) {
 			await start();
@@ -47,16 +39,19 @@ export function useSound() {
 		}
 	};
 
+	// Play when algorithm visits a node (gets higher with index)
 	const playVisitedSound = (index: number) => {
 		const note = Frequency(400 + index * 2, "hz").toNote();
 		synthRef.current?.triggerAttackRelease(note, "32n");
 	};
 
+	// Play when node is part of final path
 	const playPathSound = (index: number) => {
 		const note = Frequency(200 + index * 1, "hz").toNote();
 		bassRef.current?.triggerAttackRelease(note, "16n");
 	};
 
+	// Victory chord when algorithm finds solution
 	const playSuccessChord = async () => {
 		bassRef.current?.triggerAttackRelease("C3", "4n");
 		await new Promise((resolve) => setTimeout(resolve, 100));

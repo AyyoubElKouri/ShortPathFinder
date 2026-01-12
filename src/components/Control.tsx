@@ -77,3 +77,4 @@ export function Control() {
 		</motion.div>
 	);
 }
+

@@ -47,6 +47,7 @@ export function Grid() {
 					if (isLastCol) {
 						borderStyles.borderRight = `0.5px solid ${baseColor}`;
 					}
+          
 					if (isLastRow) {
 						borderStyles.borderBottom = `0.5px solid ${baseColor}`;
 					}

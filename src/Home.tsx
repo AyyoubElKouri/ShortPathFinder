@@ -28,3 +28,5 @@ export default function Home() {
 		</div>
 	);
 }
+
+// 🌫 Each class must have its own file named after the class, for more available domains.

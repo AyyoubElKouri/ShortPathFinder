@@ -4,15 +4,19 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { useCallback } from "react";
-
-import { useWasm } from "@/hooks/useWasm";
 import { useSound } from "@/hooks/useSound";
 import { BATCH_SIZE } from "@/lib/constants";
 import useGridStore from "@/store/useGridStore";
+import { useWasm } from "./useWasm";
 
-export function useRun() {
+interface RunReturns {
+	execute: () => Promise<void>;
+}
+
+export function useRun(): RunReturns {
 	const { readyToRun, setIsRunning } = useGridStore();
-	const { runPathfinding } = useWasm();
+	const { runAlgorithm } = useWasm();
+
 	const {
 		initializeAudio,
 		playVisitedSound,
@@ -26,68 +30,85 @@ export function useRun() {
 
 		await initializeAudio();
 
-		const result = await runPathfinding();
-		if (!result) {
-			setIsRunning(false);
-			return;
-		}
+		try {
+			const result = await runAlgorithm();
 
-		const { visited, path } = result;
-		const cols = useGridStore.getState().cols;
+			if (!result || !result.success) {
+				console.warn("No path found", result);
+				setIsRunning(false);
+				return;
+			}
 
-		const animateBatch = async (
-			cells: number[],
-			state: "visited" | "path",
-		) => {
-			for (let i = 0; i < cells.length; i += BATCH_SIZE) {
-				const batch = cells.slice(i, i + BATCH_SIZE);
+			const { visited, path, nodeIdToCoord } = result;
 
-				useGridStore.setState((gridState) => {
-					const newGrid = gridState.cellules.map((row) =>
-						row.map((cell) => ({ ...cell })),
-					);
+			const animateBatch = async (
+				nodeIds: number[],
+				state: "visited" | "path",
+			) => {
+				for (let i = 0; i < nodeIds.length; i += BATCH_SIZE) {
+					const batch = nodeIds.slice(i, i + BATCH_SIZE);
 
-					batch.forEach((index) => {
-						const x = index % cols;
-						const y = Math.floor(index / cols);
-						const currentState = newGrid[y][x].state;
-						if (currentState !== "start" && currentState !== "end") {
-							newGrid[y][x].state = state;
-						}
+					useGridStore.setState((gridState) => {
+						const newGrid = gridState.cellules.map((row) =>
+							row.map((cell) => ({ ...cell })),
+						);
+
+						batch.forEach((nodeId) => {
+							const coord = nodeIdToCoord.get(nodeId);
+							if (coord) {
+								const { x, y } = coord;
+
+								// Check bounds
+								if (y < newGrid.length && x < newGrid[0].length) {
+									const currentState = newGrid[y][x].state;
+									if (
+										currentState !== "start" &&
+										currentState !== "end"
+									) {
+										newGrid[y][x].state = state;
+									}
+								}
+							} else {
+								console.warn(`No coordinates for nodeId ${nodeId}`);
+							}
+						});
+
+						return { cellules: newGrid };
 					});
 
-					return { cellules: newGrid };
-				});
+					if (state === "visited") {
+						playVisitedSound(i);
+					} else if (state === "path") {
+						playPathSound(i);
+					}
 
-				if (state === "visited") {
-					playVisitedSound(i);
-				} else if (state === "path") {
-					playPathSound(i);
+					await new Promise((resolve) => setTimeout(resolve, 50));
 				}
+			};
 
-				await new Promise((resolve) => setTimeout(resolve, 50));
+			if (visited && visited.length > 0) {
+				await animateBatch(visited, "visited");
 			}
-		};
 
-		await animateBatch(visited, "visited");
+			await new Promise((resolve) => setTimeout(resolve, 200));
 
-		await new Promise((resolve) => setTimeout(resolve, 200));
-
-		await animateBatch(path, "path");
-
-		if (path.length > 0) {
-			await playSuccessChord();
+			if (path && path.length > 0) {
+				await animateBatch(path, "path");
+				await playSuccessChord();
+			}
+		} catch (error) {
+			console.error("Error:", error);
+		} finally {
+			setIsRunning(false);
 		}
-
-		setIsRunning(false);
 	}, [
-		runPathfinding,
 		readyToRun,
 		setIsRunning,
 		initializeAudio,
 		playVisitedSound,
 		playPathSound,
 		playSuccessChord,
+		runAlgorithm,
 	]);
 
 	return { execute };

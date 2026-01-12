@@ -129,3 +129,4 @@ export function toWasmHeuristic(Module: any, heuristic: Heuristic) {
 			return Module.Heuristic.CHEBYSHEV;
 	}
 }
+

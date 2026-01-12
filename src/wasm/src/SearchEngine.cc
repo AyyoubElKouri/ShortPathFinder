@@ -3,10 +3,14 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-#ifndef ENUMS_HH
-#define ENUMS_HH
+#include "../include/SearchEngine.hh"
 
-#include "AlgorithmType.hh"
-#include "Heuristic.hh"
+SearchResults SearchEngine::runSearch() {
 
-#endif // ENUMS_HH
+  Algorithm *algo = new DijkstraAlgorithm(heuristic, graph, startNodeId, targetNodeId,
+                                          allowDiagonal, bidirectional, dontCrossCorners);
+
+  SearchResults results = algo->execute();
+
+  return results;
+}
