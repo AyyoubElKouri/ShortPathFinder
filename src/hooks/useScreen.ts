@@ -33,10 +33,3 @@ export function useScreen(): ScreenReturns {
 
 	return dimensions;
 }
-
-/** 
- 
-🌫 Lire les éléments ligne par ligne 
-🌫 Chaque valeur a sont propres 
-
- */

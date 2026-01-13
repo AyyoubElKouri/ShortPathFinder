@@ -29,14 +29,14 @@ export function getCellColor(type: CellState): string {
 // Get display name from Algorithm
 export function getAlgorithmDisplayName(algorithm: Algorithm): string {
 	switch (algorithm) {
-		// case Algorithm.ASTAR:
-		// 	return "A*";
+		case Algorithm.ASTAR:
+			return "A*";
 		// case Algorithm.IDASTAR:
 		// 	return "IDA*";
 		case Algorithm.DIJKSTRA:
 			return "Dijkstra";
-		case Algorithm.BFS:
-			return "Breadth-First Search";
+		// case Algorithm.BFS:
+		// 	return "Breadth-First Search";
 		// case Algorithm.DFS:
 		// 	return "Depth-First Search";
 		// case Algorithm.JUMPPOINT:
@@ -45,20 +45,22 @@ export function getAlgorithmDisplayName(algorithm: Algorithm): string {
 		// 	return "Orthogonal Jump Point";
 		// case Algorithm.TRACE:
 		//    return "Trace";
+
+     
 	}
 }
 
 // Get algorithm type from name
 export function getAlgorithmFromDisplayName(name: string): Algorithm {
 	switch (name) {
-		// case "A*":
-		// 	return Algorithm.ASTAR;
+		case "A*":
+			return Algorithm.ASTAR;
 		// case "IDA*":
 		// 	return Algorithm.IDASTAR;
 		case "Dijkstra":
 			return Algorithm.DIJKSTRA;
-		case "Breadth-First Search":
-			return Algorithm.BFS;
+		// case "Breadth-First Search":
+		// 	return Algorithm.BFS;
 		// case "Depth-First Search":
 		// 	return Algorithm.DFS;
 		// case "Jump Point":
@@ -97,14 +99,14 @@ export function getAlgorithmDisplayNames(): string[] {
 // Mapping to WebAssembly Algorithm
 export function toWasmAlgorithm(Module: any, algo: Algorithm) {
 	switch (algo) {
-		// case Algorithm.ASTAR:
-		// 	return Module.Algorithm.ASTAR;
+		case Algorithm.ASTAR:
+			return Module.Algorithm.ASTAR;
 		// case Algorithm.IDASTAR:
 		// 	return Module.Algorithm.IDASTAR;
 		case Algorithm.DIJKSTRA:
 			return Module.Algorithm.DIJKSTRA;
-		case Algorithm.BFS:
-			return Module.Algorithm.BFS;
+		// case Algorithm.BFS:
+		// 	return Module.Algorithm.BFS;
 		// case Algorithm.DFS:
 		// 	return Module.Algorithm.DFS;
 		// case Algorithm.JUMPPOINT:

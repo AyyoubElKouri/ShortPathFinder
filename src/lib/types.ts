@@ -5,7 +5,7 @@
 
 // Different algorithms available for pathfinding
 export enum Algorithm {
-	// ASTAR,
+	ASTAR,
 	// IDASTAR,
 	DIJKSTRA,
 	BFS,

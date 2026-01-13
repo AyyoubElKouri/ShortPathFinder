@@ -33,9 +33,7 @@ export function Grid() {
 					const isLastRow = cell.y === rows - 1;
 					const isLastCol = cell.x === cols - 1;
 
-					const baseColor = ["empty", "visited", "path"].includes(
-						cell.state,
-					)
+					const baseColor = ["empty", "visited", "path"].includes(cell.state)
 						? "#2C252C"
 						: getCellColor(cell.state);
 
@@ -47,7 +45,7 @@ export function Grid() {
 					if (isLastCol) {
 						borderStyles.borderRight = `0.5px solid ${baseColor}`;
 					}
-          
+
 					if (isLastRow) {
 						borderStyles.borderBottom = `0.5px solid ${baseColor}`;
 					}

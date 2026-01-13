@@ -55,3 +55,5 @@ export const useAlgorithmStore = create<AlgorithmStore>((set, get) => ({
 		set({ config: newConfig });
 	},
 }));
+
+

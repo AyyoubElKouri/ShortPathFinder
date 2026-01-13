@@ -17,12 +17,8 @@ export function useRun(): RunReturns {
 	const { readyToRun, setIsRunning } = useGridStore();
 	const { runAlgorithm } = useWasm();
 
-	const {
-		initializeAudio,
-		playVisitedSound,
-		playPathSound,
-		playSuccessChord,
-	} = useSound();
+	const { initializeAudio, playVisitedSound, playPathSound, playSuccessChord } =
+		useSound();
 
 	const execute = useCallback(async () => {
 		readyToRun();
@@ -61,10 +57,7 @@ export function useRun(): RunReturns {
 								// Check bounds
 								if (y < newGrid.length && x < newGrid[0].length) {
 									const currentState = newGrid[y][x].state;
-									if (
-										currentState !== "start" &&
-										currentState !== "end"
-									) {
+									if (currentState !== "start" && currentState !== "end") {
 										newGrid[y][x].state = state;
 									}
 								}

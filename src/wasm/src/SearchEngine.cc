@@ -7,10 +7,17 @@
 
 SearchResults SearchEngine::runSearch() {
 
-  Algorithm *algo = new DijkstraAlgorithm(heuristic, graph, startNodeId, targetNodeId,
-                                          allowDiagonal, bidirectional, dontCrossCorners);
+  Algorithm *algo = nullptr;
+
+  switch (algorithm) {
+  case AlgorithmType::DIJKSTRA:
+    algo = new DijkstraAlgorithm(heuristic, graph, startNodeId, targetNodeId, allowDiagonal,
+                                 bidirectional, dontCrossCorners);
+    break;
+ }
 
   SearchResults results = algo->execute();
+  delete algo;
 
   return results;
 }

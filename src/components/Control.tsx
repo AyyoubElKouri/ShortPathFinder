@@ -38,7 +38,7 @@ export function Control() {
 			<ConfigSelector />
 			<Seperator />
 
-			<Button
+      <Button
 				label="Generate Maze"
 				shortcut="M"
 				icon={<Atom />}
@@ -77,4 +77,3 @@ export function Control() {
 		</motion.div>
 	);
 }
-
