@@ -1,12 +1,17 @@
 /*--------------------------------------------------------------------------------------------------
- *                       Copyright (c) Ayyoub EL Kouri. All rights reserved
+ *                     Copyright (c) 2026 Ayyoub EL Kouri. All rights reserved.
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
+/**
+ * TODO: This file to be refactored.
+ */
+
 import { useCallback, useEffect, useState } from "react";
-import type { Cellule } from "@/lib/types";
-import { useGridStore } from "@/store/useGridStore";
-import { useScreen } from "./useScreen";
+import { CELL_SIZE } from "@/constants";
+import { useScreen } from "@/hooks/helpers/useScreen";
+import { useGridStore } from "@/stores";
+import type { Cellule } from "@/types";
 
 export interface GridHandlers {
 	mouseDown: (cell: Cellule) => void;
@@ -23,7 +28,6 @@ export interface GridActions {
 
 export interface GridReturns {
 	cellules: Cellule[][];
-	cellSize: number;
 	handlers: GridHandlers;
 	actions: GridActions;
 }
@@ -31,27 +35,18 @@ export interface GridReturns {
 export function useGrid(): GridReturns {
 	const [isMouseDown, setIsMouseDown] = useState(false);
 
-	const {
-		cellules,
-		cellSize,
-		setRows,
-		setCols,
-		updateCell,
-		clearWalls,
-		clearPath,
-		resetGrid,
-		generateMaze,
-	} = useGridStore();
+	const { cellules, setRows, setCols, updateCell, clearWalls, clearPath, resetGrid, generateMaze } =
+		useGridStore();
 
 	const { width, height } = useScreen();
 
 	useEffect(() => {
-		const rows = Math.floor(height / cellSize);
-		const cols = Math.floor(width / cellSize);
+		const rows = Math.floor(height / CELL_SIZE);
+		const cols = Math.floor(width / CELL_SIZE);
 
 		setRows(rows);
 		setCols(cols);
-	}, [width, height, cellSize, setRows, setCols]);
+	}, [width, height, setRows, setCols]);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -97,7 +92,6 @@ export function useGrid(): GridReturns {
 
 	return {
 		cellules,
-		cellSize,
 
 		handlers: {
 			mouseDown: handleMouseDown,

@@ -23,6 +23,7 @@
 		"react-dom": "^19.1.1",
 		"tailwindcss": "^4.1.17",
 		"tone": "^15.1.22",
+		"vite-plugin-wasm": "^3.5.0",
 		"zustand": "^5.0.8"
 	},
 	"devDependencies": {

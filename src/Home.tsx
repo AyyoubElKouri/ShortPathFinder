@@ -4,11 +4,9 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { motion } from "framer-motion";
-import { Control } from "@/components/Control";
-import { Grid } from "@/components/Grid";
-import useGridStore from "@/store/useGridStore";
+import { ControlPanel, Grid, SplashScreen } from "@/components";
 
-import { SplashScreen } from "./components/SplashScreen";
+import { useGridStore } from "@/stores";
 
 export default function Home() {
 	const { isRunning } = useGridStore();
@@ -23,10 +21,8 @@ export default function Home() {
 				animate={{ opacity: isRunning ? 0 : 1 }}
 				transition={{ duration: 0.3 }}
 			>
-				<Control />
+				<ControlPanel />
 			</motion.div>
 		</div>
 	);
 }
-
-// 🌫 Each class must have its own file named after the class, for more available domains.

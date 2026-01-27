@@ -1,13 +1,14 @@
 /*--------------------------------------------------------------------------------------------------
- *                       Copyright (c) Ayyoub EL Kouri. All rights reserved
+ *                     Copyright (c) 2026 Ayyoub EL Kouri. All rights reserved.
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
+import { CELL_SIZE } from "@/constants";
 import { useGrid } from "@/hooks/useGrid";
-import { getCellColor } from "@/lib/utils";
+import { getCellColor } from "@/utils";
 
 export function Grid() {
-	const { cellules, cellSize, handlers } = useGrid();
+	const { cellules, handlers } = useGrid();
 
 	return (
 		<button
@@ -21,8 +22,8 @@ export function Grid() {
 				type="button"
 				style={{
 					display: "grid",
-					gridTemplateRows: `repeat(${cellules.length}, ${cellSize}px)`,
-					gridTemplateColumns: `repeat(${cellules[0].length}, ${cellSize}px)`,
+					gridTemplateRows: `repeat(${cellules.length}, ${CELL_SIZE}px)`,
+					gridTemplateColumns: `repeat(${cellules[0].length}, ${CELL_SIZE}px)`,
 				}}
 				onMouseUp={handlers.mouseUp}
 			>
@@ -55,8 +56,8 @@ export function Grid() {
 							type="button"
 							key={`${cell.x}-${cell.y}`}
 							style={{
-								width: cellSize,
-								height: cellSize,
+								width: CELL_SIZE,
+								height: CELL_SIZE,
 								backgroundColor: getCellColor(cell.state),
 								boxSizing: "border-box",
 								transition: "background-color 0.2s ease",

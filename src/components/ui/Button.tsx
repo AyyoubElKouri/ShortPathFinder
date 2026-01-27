@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------------------
- *                       Copyright (c) Ayyoub EL Kouri. All rights reserved
+ *                     Copyright (c) 2026 Ayyoub EL Kouri. All rights reserved.
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
@@ -14,13 +14,7 @@ interface ButtonProps {
 	callback?: () => void;
 }
 
-export function Button({
-	isRun = false,
-	label,
-	icon,
-	shortcut,
-	callback,
-}: ButtonProps) {
+export function Button({ isRun = false, label, icon, shortcut, callback }: ButtonProps) {
 	const [hovered, setHovered] = useState(false);
 
 	useEffect(() => {
