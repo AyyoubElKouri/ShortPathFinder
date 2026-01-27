@@ -54,7 +54,6 @@ export function useWebAssembly(): WebAssemblyReturns {
 		};
 	}, []);
 
-	// Le reste de ton code reste identique...
 	const findPath = useCallback(
 		({
 			grid,
@@ -104,7 +103,6 @@ export function useWebAssembly(): WebAssemblyReturns {
 	return { ready, findPath };
 }
 
-// Déclaration globale
 declare global {
 	interface Window {
 		PathfindingModule: any;
