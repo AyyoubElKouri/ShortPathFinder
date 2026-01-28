@@ -9,8 +9,6 @@ export async function loadWasm(): Promise<MainModule> {
 
   wasmModulePromise = (async () => {
     try {
-      // 1. Put your WASM files in public/ folder
-      // 2. Then use this absolute path
       const wasmPath = '/wasm/pathfinding.js';
       
       // Load the WASM JS file
