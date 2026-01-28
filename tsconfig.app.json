@@ -28,6 +28,6 @@
 			"@/*": ["src/*"]
 		}
 	},
-	"include": ["src", "public/wasm/pathfinding.js", "src/wasm/pathfinding.d.ts"],
+	"include": ["src", "public/wasm/pathfinding.js", "public/wasm/pathfinding.d.ts"],
 	"allowJs": true
 }

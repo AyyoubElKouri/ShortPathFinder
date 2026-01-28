@@ -5,8 +5,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PathfindingParams, PathfindingResponse } from "@/types";
-import { loadWasm as _loadWasm } from "@/wasm/loader";
-import type { MainModule } from "@/wasm/pathfinding";
+import { loadWasm as _loadWasm } from "@/utils/loader.utils";
+import type { MainModule } from "public/wasm/pathfinding";
 
 interface WebAssemblyReturns {
 	/**
