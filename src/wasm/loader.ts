@@ -106,7 +106,7 @@ async function loadViaScriptTag(): Promise<MainModule> {
     }
 
     const script = document.createElement('script');
-    script.src = '/pathfinding.js';
+    script.src = './pathfinding.js';
     script.type = 'text/javascript';
     script.async = true;
 
