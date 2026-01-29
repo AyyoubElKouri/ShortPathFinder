@@ -7,7 +7,7 @@ export * from "./AlgoSelector";
 export * from "./ConfigSelector";
 export * from "./ControlPanel";
 export * from "./Grid";
-export * from "./HuristicSelector";
+export * from "./HeuristicSelector";
 export * from "./ModeSelector";
 export * from "./SplashScreen";
 export * from "./ui/Button";
