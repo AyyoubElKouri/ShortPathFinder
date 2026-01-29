@@ -9,8 +9,8 @@
  */
 export enum Algorithm {
 	DIJKSTRA = "Dijkstra",
-	ASTAR = "AStar",
-	IDASTAR = "IDAStar",
+	ASTAR = "A*",
+	IDASTAR = "IDA*",
 	BFS = "Breadth First Search",
 	DFS = "Depth First Search",
 	JUMPPOINT = "Jump Point",

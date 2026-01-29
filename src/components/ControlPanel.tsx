@@ -45,9 +45,7 @@ export function ControlPanel() {
 			<Seperator />
 
 			<Button label="Reset Grid" shortcut="R" icon={<RotateCcw />} callback={actions.resetGrid} />
-
 			<Button label="Clear Walls" shortcut="W" icon={<BrickWall />} callback={actions.clearWalls} />
-
 			<Button label="Clear Path" shortcut="P" icon={<Route />} callback={actions.clearPath} />
 
 			<Button
