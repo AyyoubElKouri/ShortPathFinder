@@ -75,11 +75,14 @@ export function useRun(): RunReturns {
 
 			const wasmHeuristic = ((): any => {
 				switch (config.heuristic) {
+					case Heuristic.MANHATTAN:
+						return { value: 0 };
 					case Heuristic.EUCLIDEAN:
 						return { value: 1 };
-					case Heuristic.MANHATTAN:
-					default:
-						return { value: 0 };
+					case Heuristic.OCTILE:
+						return { value: 2 };
+					case Heuristic.CHEBYSHEV:
+						return { value: 3 };
 				}
 			})();
 
