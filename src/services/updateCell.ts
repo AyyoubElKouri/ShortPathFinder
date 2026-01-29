@@ -3,7 +3,7 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-import type { Cellule } from "@/types";
+import type { CellState, Cellule } from "@/types";
 import { findSpecialCells, isWithinBounds } from "@/utils";
 
 interface UpdateCellResult {
@@ -75,8 +75,8 @@ function determineNewCellState(
 	currentCell: Cellule,
 	start: Cellule | null,
 	end: Cellule | null,
-	passedState?: Cellule["state"],
-): Cellule["state"] {
+	passedState?: CellState,
+): CellState {
 	if (passedState === "path" || passedState === "visited") {
 		return passedState;
 	}
