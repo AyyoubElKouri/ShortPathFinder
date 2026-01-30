@@ -48,6 +48,18 @@ export function SplashScreen() {
 					Press {shortcut}
 				</button>
 			</motion.div>
+
+			<span className="block text-gray-400 absolute bottom-6">
+				Made by{" "}
+				<a
+					className="underline hover:text-amber-500"
+					href="https://github.com/ayyoubelkouri"
+					target="_blank"
+					rel="noopener"
+				>
+					Ayyoub el kouri
+				</a>
+			</span>
 		</motion.div>
 	);
 }
