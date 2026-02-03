@@ -12,19 +12,14 @@ import {
 	Route,
 } from "lucide-react";
 
-import { AlgoSelector } from "@/components/selectors/AlgoSelector";
-import { ConfigSelector } from "@/components/selectors/ConfigSelector";
+
 import { Button } from "@/components/ui/Button";
 import { Seperator } from "@/components/ui/Seperator";
 import { useGrid } from "@/hooks/useGrid";
 import { useRun } from "@/hooks/useRun";
-import { isHeuristic } from "@/utils";
-import { useAlgorithmStore } from "@/stores";
-import { HeuristicSelector } from "../selectors/HeuristicSelector";
 import { ModeSelector } from "../selectors/ModeSelector";
 
 export function DoubleGridRunPanel() {
-	const { algorithm } = useAlgorithmStore();
 	const { actions } = useGrid();
 	const { execute } = useRun();
 
