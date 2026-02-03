@@ -10,8 +10,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { CELL_SIZE } from "@/constants";
 import { useScreen } from "@/hooks/helpers/useScreen";
-import { useGridStore } from "@/stores";
-import type { Cellule } from "@/types";
+import { useGridStore, useModeStore } from "@/stores";
+import { ApplicationMode, type Cellule } from "@/types";
 
 export interface GridHandlers {
 	mouseDown: (cell: Cellule) => void;
@@ -32,17 +32,31 @@ export interface GridReturns {
 	actions: GridActions;
 }
 
-export function useGrid(): GridReturns {
+export function useGrid(useSecondState = false): GridReturns {
 	const [isMouseDown, setIsMouseDown] = useState(false);
 
-	const { cellules, setRows, setCols, updateCell, clearWalls, clearPath, resetGrid, generateMaze } =
-		useGridStore();
+	const {
+		cellules,
+		secondCellules,
+		setRows,
+		setCols,
+		updateCell,
+		clearWalls,
+		clearPath,
+		resetGrid,
+		generateMaze,
+	} = useGridStore();
+
+	const { mode } = useModeStore();
 
 	const { width, height } = useScreen();
 
 	useEffect(() => {
-		const rows = Math.floor(height / CELL_SIZE);
-		const cols = Math.floor(width / CELL_SIZE);
+    const width_ = mode === ApplicationMode.SingleGrid ? width : 600;
+    const height_ = mode === ApplicationMode.SingleGrid ? height : 600;
+
+		const rows = Math.floor(height_ / CELL_SIZE);
+		const cols = Math.floor(width_ / CELL_SIZE);
 
 		setRows(rows);
 		setCols(cols);
@@ -91,7 +105,7 @@ export function useGrid(): GridReturns {
 	}, [isMouseDown, updateCell]);
 
 	return {
-		cellules,
+		cellules: useSecondState ? secondCellules : cellules,
 
 		handlers: {
 			mouseDown: handleMouseDown,

@@ -7,8 +7,12 @@ import { CELL_SIZE } from "@/constants";
 import { useGrid } from "@/hooks/useGrid";
 import { getCellColor } from "@/utils";
 
-export function Grid() {
-	const { cellules, handlers } = useGrid();
+interface GridProps {
+	useSecondState?: boolean;
+}
+
+export function Grid({ useSecondState = false }: GridProps) {
+	const { cellules, handlers } = useGrid(useSecondState);
 
 	return (
 		<button
@@ -26,6 +30,7 @@ export function Grid() {
 					gridTemplateColumns: `repeat(${cellules[0].length}, ${CELL_SIZE}px)`,
 				}}
 				onMouseUp={handlers.mouseUp}
+        className="p-1 bg-[#0D0B0D]"
 			>
 				{cellules.flat().map((cell) => {
 					const rows = cellules.length;

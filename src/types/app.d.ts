@@ -1,6 +1,13 @@
 /*--------------------------------------------------------------------------------------------------
- *                     Copyright (c) 2026 Ayyoub EL Kouri. All rights reserved.
+ *                       Copyright (c) Ayyoub EL Kouri. All rights reserved
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-export function ModeSelector() {}
+/**
+ * @enum ApplicationMode
+ * Different modes available in the application.
+ */
+export enum ApplicationMode {
+	SingleGrid = "Single Grid",
+	DoubleGrid = "Double Grid",
+}

@@ -3,15 +3,11 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-/**
- * TODO: This file to be refactored.
- */
-
 import { useCallback } from "react";
 import { useSound } from "@/hooks/helpers/useSound";
-import { useAlgorithmStore } from "@/stores";
+import { useAlgorithmStore, useModeStore, useSecondAlgorithm } from "@/stores";
 import useGridStore from "@/stores/grid.store.ts";
-import { Algorithm, Heuristic } from "@/types";
+import { Algorithm, ApplicationMode, Heuristic, type PathfindingConfig } from "@/types";
 import { useWebAssembly } from "./useWebAssembly";
 
 interface RunReturns {
@@ -19,8 +15,14 @@ interface RunReturns {
 }
 
 export function useRun(): RunReturns {
-	const { prepareGrid, setIsRunning, cellules } = useGridStore();
-	const { algorithm, config } = useAlgorithmStore();
+	const { prepareGrid, setIsRunning } = useGridStore();
+	const { algorithm, config, setLastResult } = useAlgorithmStore();
+	const {
+		algorithm: secondAlgorithm,
+		config: secondConfig,
+		setLastResult: setSecondLastResult,
+	} = useSecondAlgorithm();
+	const { mode } = useModeStore();
 	const { ready, findPath } = useWebAssembly();
 
 	const { initializeAudio, playVisitedSound, playPathSound, playSuccessChord } = useSound();
@@ -28,6 +30,8 @@ export function useRun(): RunReturns {
 	const execute = useCallback(async () => {
 		prepareGrid();
 		setIsRunning(true);
+		setLastResult(null);
+		setSecondLastResult(null);
 
 		await initializeAudio();
 
@@ -37,6 +41,8 @@ export function useRun(): RunReturns {
 				console.error("WebAssembly module is not ready");
 				return;
 			}
+
+			const { cellules } = useGridStore.getState();
 
 			// locate start and goal
 			let startId = -1;
@@ -57,13 +63,13 @@ export function useRun(): RunReturns {
 				return;
 			}
 
-			const gridData = new Uint8Array(
+			const baseGridData = new Uint8Array(
 				cellules.flat().map((cell) => (cell.state === "wall" ? 1 : 0)),
 			);
 
 			// map local enums to wasm numeric values (embind expects { value: number })
-			const wasmAlgorithm = ((): any => {
-				switch (algorithm) {
+			const toWasmAlgorithm = (value: Algorithm): any => {
+				switch (value) {
 					case Algorithm.DIJKSTRA:
 						return { value: 1 };
 					case Algorithm.ASTAR:
@@ -71,10 +77,10 @@ export function useRun(): RunReturns {
 					default:
 						return { value: 1 };
 				}
-			})();
+			};
 
-			const wasmHeuristic = ((): any => {
-				switch (config.heuristic) {
+			const toWasmHeuristic = (value?: Heuristic): any => {
+				switch (value) {
 					case Heuristic.MANHATTAN:
 						return { value: 0 };
 					case Heuristic.EUCLIDEAN:
@@ -83,25 +89,30 @@ export function useRun(): RunReturns {
 						return { value: 2 };
 					case Heuristic.CHEBYSHEV:
 						return { value: 3 };
+					default:
+						return undefined;
 				}
-			})();
+			};
 
-			const result = findPath({
-				grid: gridData,
+			const buildParams = (grid: Uint8Array, algo: Algorithm, algoConfig: PathfindingConfig) => ({
+				grid,
 				width: w,
 				height: h,
 				startIndex: startId,
 				goalIndex: goalId,
-				algorithm: wasmAlgorithm,
-				heuristic: wasmHeuristic,
-				allowDiagonal: config.allowDiagonal,
-				bidirectional: config.bidirectional,
-				dontCrossCorners: config.dontCrossCorners,
+				algorithm: toWasmAlgorithm(algo),
+				heuristic: toWasmHeuristic(algoConfig.heuristic),
+				allowDiagonal: algoConfig.allowDiagonal,
+				bidirectional: algoConfig.bidirectional,
+				dontCrossCorners: algoConfig.dontCrossCorners,
 			});
 
-			const { visited, path, success, cost, time } = result;
+			const logStats = (label: string, result: ReturnType<typeof findPath>) => {
+				console.log(
+					`${label} success=${result.success} Cost: ${result.cost}, Time: ${result.time}ms, Visited: ${result.visited?.length || 0}, Path length: ${result.path?.length || 0}`,
+				);
+			};
 
-			// Créer une Map pour convertir nodeId -> coordonnées (x, y)
 			const createNodeIdToCoordMap = (): Map<number, { x: number; y: number }> => {
 				const map = new Map<number, { x: number; y: number }>();
 				const width = cellules[0].length;
@@ -119,12 +130,19 @@ export function useRun(): RunReturns {
 
 			const nodeIdToCoord = createNodeIdToCoordMap();
 
-			const animateBatch = async (nodeIds: number[], state: "visited" | "path") => {
+			const animateBatch = async (
+				nodeIds: number[],
+				state: "visited" | "path",
+				target: "cellules" | "secondCellules",
+				withSound: boolean,
+			) => {
 				for (let i = 0; i < nodeIds.length; i += 5) {
 					const batch = nodeIds.slice(i, i + 5);
 
 					useGridStore.setState((gridState) => {
-						const newGrid = gridState.cellules.map((row) => row.map((cell) => ({ ...cell })));
+						const sourceGrid =
+							target === "cellules" ? gridState.cellules : gridState.secondCellules;
+						const newGrid = sourceGrid.map((row) => row.map((cell) => ({ ...cell })));
 
 						batch.forEach((nodeId) => {
 							const coord = nodeIdToCoord.get(nodeId);
@@ -143,34 +161,67 @@ export function useRun(): RunReturns {
 							}
 						});
 
-						return { cellules: newGrid };
+						return target === "cellules"
+							? { cellules: newGrid }
+							: { secondCellules: newGrid };
 					});
 
-					if (state === "visited") {
-						playVisitedSound(i);
-					} else if (state === "path") {
-						playPathSound(i);
+					if (withSound) {
+						if (state === "visited") {
+							playVisitedSound(i);
+						} else if (state === "path") {
+							playPathSound(i);
+						}
 					}
 
 					await new Promise((resolve) => setTimeout(resolve, 50));
 				}
 			};
 
-			if (visited && visited.length > 0) {
-				await animateBatch(visited, "visited");
+			const animateResult = async (
+				result: ReturnType<typeof findPath>,
+				target: "cellules" | "secondCellules",
+				withSound: boolean,
+			) => {
+				if (result.visited && result.visited.length > 0) {
+					await animateBatch(result.visited, "visited", target, withSound);
+				}
+
+				await new Promise((resolve) => setTimeout(resolve, 200));
+
+				if (result.path && result.path.length > 0) {
+					await animateBatch(result.path, "path", target, withSound);
+					if (withSound) {
+						await playSuccessChord();
+					}
+				}
+			};
+
+			if (mode === ApplicationMode.DoubleGrid) {
+				const firstGrid = baseGridData.slice();
+				const secondGrid = baseGridData.slice();
+
+				const firstResult = findPath(buildParams(firstGrid, algorithm, config));
+				const secondResult = findPath(buildParams(secondGrid, secondAlgorithm, secondConfig));
+
+				setLastResult({ cost: firstResult.cost, visited: firstResult.visited });
+				setSecondLastResult({ cost: secondResult.cost, visited: secondResult.visited });
+
+				await Promise.all([
+					animateResult(firstResult, "cellules", true),
+					animateResult(secondResult, "secondCellules", false),
+				]);
+
+				logStats("First grid:", firstResult);
+				logStats("Second grid:", secondResult);
+			} else {
+				const firstGrid = baseGridData.slice();
+				const result = findPath(buildParams(firstGrid, algorithm, config));
+
+				setLastResult({ cost: result.cost, visited: result.visited });
+				await animateResult(result, "cellules", true);
+				logStats("Path found!", result);
 			}
-
-			await new Promise((resolve) => setTimeout(resolve, 200));
-
-			if (path && path.length > 0) {
-				await animateBatch(path, "path");
-				await playSuccessChord();
-			}
-
-			// Afficher les statistiques
-			console.log(
-				`Path found! success=${success} Cost: ${cost}, Time: ${time}ms, Visited: ${visited?.length || 0}, Path length: ${path?.length || 0}`,
-			);
 		} catch (error) {
 			console.error("Error:", error);
 		} finally {
@@ -179,13 +230,17 @@ export function useRun(): RunReturns {
 	}, [
 		prepareGrid,
 		setIsRunning,
+		setLastResult,
+		setSecondLastResult,
 		initializeAudio,
 		playVisitedSound,
 		playPathSound,
 		playSuccessChord,
-		cellules,
 		algorithm,
 		config,
+		secondAlgorithm,
+		secondConfig,
+		mode,
 		ready,
 		findPath,
 	]);

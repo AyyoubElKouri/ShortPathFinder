@@ -50,7 +50,7 @@ export function PopupContainer({ buttonProps, children }: PopupButtonProps) {
 				/>
 
 				<motion.div
-					className="relative flex w-[700px] max-w-[92vw] h-[85vh] flex-col
+					className="relative flex w-[700px] max-w-[92vw] flex-col
 						bg-[#2C2D2D] border border-[#404141] rounded-xl
 						shadow-[0_10px_32px_rgba(0,0,0,0.4)]"
 					initial={{ opacity: 0, scale: 0.98, y: 8 }}

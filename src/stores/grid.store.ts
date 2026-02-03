@@ -35,6 +35,11 @@ export interface GridStore {
 	cellules: Cellule[][];
 
 	/**
+	 * 2D array representing the grid of cells for the second grid.
+	 */
+	secondCellules: Cellule[][];
+
+	/**
 	 * History state for undo/redo functionality.
 	 */
 	history: HistoryState;
@@ -132,6 +137,7 @@ export const useGridStore = create<GridStore>()(
 			rows: 30,
 			cols: 50,
 			cellules: createInitialGrid(30, 50),
+			secondCellules: createInitialGrid(30, 50),
 			history: historyManager.createEmptyHistory(),
 			isRunning: false,
 
@@ -140,6 +146,7 @@ export const useGridStore = create<GridStore>()(
 				set({
 					rows,
 					cellules: createInitialGrid(rows, cols),
+					secondCellules: createInitialGrid(rows, cols),
 					history: historyManager.clearHistory(),
 				});
 			},
@@ -149,6 +156,7 @@ export const useGridStore = create<GridStore>()(
 				set({
 					cols,
 					cellules: createInitialGrid(rows, cols),
+					secondCellules: createInitialGrid(rows, cols),
 					history: historyManager.clearHistory(),
 				});
 			},
@@ -203,6 +211,7 @@ export const useGridStore = create<GridStore>()(
 
 				set({
 					cellules: grid,
+					secondCellules: deepCopyGrid(grid),
 					history: newHistory,
 				});
 			},
@@ -220,6 +229,7 @@ export const useGridStore = create<GridStore>()(
 
 				set({
 					cellules: grid,
+					secondCellules: deepCopyGrid(grid),
 					history: newHistory,
 				});
 			},
@@ -243,6 +253,7 @@ export const useGridStore = create<GridStore>()(
 
 				set({
 					cellules: generatedGrid,
+					secondCellules: deepCopyGrid(generatedGrid),
 					history: newHistory,
 				});
 			},
@@ -257,6 +268,7 @@ export const useGridStore = create<GridStore>()(
 				if (modified) {
 					set({
 						cellules: grid,
+						secondCellules: deepCopyGrid(grid),
 					});
 				}
 			},
@@ -272,6 +284,7 @@ export const useGridStore = create<GridStore>()(
 
 				set({
 					cellules: grid,
+					secondCellules: deepCopyGrid(grid),
 					history: newHistory,
 				});
 			},
@@ -288,6 +301,7 @@ export const useGridStore = create<GridStore>()(
 
 				set({
 					cellules: [...cellules], // Trigger re-render
+					secondCellules: deepCopyGrid(cellules),
 					history: newHistory,
 				});
 			},
@@ -304,6 +318,7 @@ export const useGridStore = create<GridStore>()(
 
 				set({
 					cellules: [...cellules], // Trigger re-render
+					secondCellules: deepCopyGrid(cellules),
 					history: newHistory,
 				});
 			},
@@ -377,6 +392,7 @@ function handleDragFinalization(
 	set({
 		tempCellules: undefined,
 		originalGridForDrag: undefined,
+		secondCellules: deepCopyGrid(currentGrid),
 		history: finalHistory,
 	});
 }
@@ -404,6 +420,7 @@ function handleFirstDragCell(
 
 	set({
 		cellules: newGrid,
+		secondCellules: deepCopyGrid(newGrid),
 		tempCellules: [...currentTemp, ...cellsArray],
 		originalGridForDrag: originalGrid,
 		history: newHistory,
@@ -423,6 +440,7 @@ function handleSubsequentDragCell(
 	const currentTemp = tempCellules || [];
 	set({
 		cellules: newGrid,
+		secondCellules: deepCopyGrid(newGrid),
 		tempCellules: [...currentTemp, ...cellsArray],
 	});
 }
@@ -444,6 +462,7 @@ function handleImmediateCommit(
 
 	set({
 		cellules: newGrid,
+		secondCellules: deepCopyGrid(newGrid),
 		history: newHistory,
 		tempCellules: commitHistory === true ? undefined : tempCellules,
 	});

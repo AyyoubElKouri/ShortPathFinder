@@ -4,16 +4,15 @@
  *------------------------------------------------------------------------------------------------*/
 
 import { motion } from "framer-motion";
-import { ControlPanel, Grid, SplashScreen } from "@/components";
+import { SingleGridPanel, Grid } from "@/components";
 
 import { useGridStore } from "@/stores";
 
-export default function Home() {
+export function SingleGrid() {
 	const { isRunning } = useGridStore();
 
 	return (
 		<div className="relative w-full h-svh flex justify-center bg-[#141114]">
-			<SplashScreen />
 			<Grid />
 
 			<motion.div
@@ -21,7 +20,7 @@ export default function Home() {
 				animate={{ opacity: isRunning ? 0 : 1 }}
 				transition={{ duration: 0.3 }}
 			>
-				<ControlPanel />
+				<SingleGridPanel />
 			</motion.div>
 		</div>
 	);

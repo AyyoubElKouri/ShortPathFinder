@@ -1,12 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import Home from "./Home";
-import "./globals.css";
+import { Router } from "./pages";
+import "@/styles/globals.css";
 
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
-		<Home />
+		<Router />
 	</StrictMode>,
 );
-
-// SmartLib – Intelligent library system for book tracking, user management, and borrowing

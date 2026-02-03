@@ -5,3 +5,4 @@
 
 export * from "./algorithm.store";
 export * from "./grid.store";
+export * from "./mode.store";
