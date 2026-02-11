@@ -5,7 +5,17 @@
 #include "factories/HeuristicFactory.hh"
 #include "factories/AlgorithmFactory.hh"
 
-Result PathfindingEngine::findPath(const std::vector<int>& grid, int width, int height, int startIndex, int goalIndex, AlgorithmType algorithm, HeuristicType heuristic, bool allowDiagonal, bool /*dontCrossCorners*/, bool /*bidirectional*/) {
+Result PathfindingEngine::findPath(
+    const std::vector<int>& grid,
+    int width,
+    int height,
+    int startIndex,
+    int goalIndex,
+    AlgorithmType algorithm,
+    HeuristicType heuristic,
+    bool allowDiagonal,
+    bool dontCrossCorners,
+    bool bidirectional) {
   // Build nodes from the grid (0 = walkable, non-zero = blocked)
   std::vector<Node> nodes;
   nodes.reserve(width * height);
@@ -32,9 +42,8 @@ Result PathfindingEngine::findPath(const std::vector<int>& grid, int width, int 
   AlgorithmConfig cfg;
   cfg.heuristic = heur;
   cfg.allowDiagonal = allowDiagonal;
-  // Note: AlgorithmConfig currently supports heuristic and allowDiagonal only.
-  // dontCrossCorners and bidirectional are accepted by this API for future
-  // extensions but are not currently applied to cfg.
+  cfg.dontCrossCorners = dontCrossCorners;
+  cfg.bidirectional = bidirectional;
 
   auto alg = AlgorithmFactory::createAlgorithm(algorithm);
   return alg->findPath(*graph, static_cast<NodeId>(startIndex), static_cast<NodeId>(goalIndex), cfg);

@@ -70,10 +70,22 @@ export function useRun(): RunReturns {
 			// map local enums to wasm numeric values (embind expects { value: number })
 			const toWasmAlgorithm = (value: Algorithm): any => {
 				switch (value) {
+					case Algorithm.BFS:
+						return { value: 0 };
 					case Algorithm.DIJKSTRA:
 						return { value: 1 };
 					case Algorithm.ASTAR:
 						return { value: 2 };
+					case Algorithm.IDASTAR:
+						return { value: 3 };
+					case Algorithm.DFS:
+						return { value: 4 };
+					case Algorithm.JUMPPOINT:
+						return { value: 5 };
+					case Algorithm.ORTHOGONALJUMPPOINT:
+						return { value: 6 };
+					case Algorithm.TRACE:
+						return { value: 7 };
 					default:
 						return { value: 1 };
 				}

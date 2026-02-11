@@ -58,13 +58,21 @@ EMSCRIPTEN_BINDINGS(pathfinding_api) {
     using namespace emscripten;
 
     enum_<AlgorithmType>("AlgorithmType")
-        .value("ASTAR", AlgorithmType::ASTAR)
+        .value("BFS", AlgorithmType::BFS)
         .value("DIJKSTRA", AlgorithmType::DIJKSTRA)
+        .value("ASTAR", AlgorithmType::ASTAR)
+        .value("IDASTAR", AlgorithmType::IDASTAR)
+        .value("DFS", AlgorithmType::DFS)
+        .value("JUMPPOINT", AlgorithmType::JUMPPOINT)
+        .value("ORTHOGONALJUMPPOINT", AlgorithmType::ORTHOGONALJUMPPOINT)
+        .value("TRACE", AlgorithmType::TRACE)
         ;
 
     enum_<HeuristicType>("HeuristicType")
         .value("MANHATTAN", HeuristicType::MANHATTAN)
         .value("EUCLIDEAN", HeuristicType::EUCLIDEAN)
+        .value("OCTILE", HeuristicType::OCTILE)
+        .value("CHEBYSHEV", HeuristicType::CHEBYSHEV)
         ;
 
     value_object<api::PathfindingConfig>("PathfindingConfig")

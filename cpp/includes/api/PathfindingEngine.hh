@@ -21,5 +21,15 @@
 class PathfindingEngine {
 
   public:
-    static Result findPath(const std::vector<int>& grid, int width, int height, int startIndex, int goalIndex, AlgorithmType algorithm, HeuristicType heuristic = HeuristicType::MANHATTAN, bool allowDiagonal = true, bool dontCrossCorners = false, bool bidirectional = false);
+    static Result findPath(
+        const std::vector<int>& grid,
+        int width,
+        int height,
+        int startIndex,
+        int goalIndex,
+        AlgorithmType algorithm,
+        HeuristicType heuristic = HeuristicType::MANHATTAN,
+        bool allowDiagonal = true,
+        bool dontCrossCorners = false,
+        bool bidirectional = false);
 };

@@ -12,20 +12,12 @@
 #include "graph/IGraph.hh"
 #include "heuristics/IHeuristic.hh"
 
-/**
- * @brief Configuration structure for pathfinding algorithms.
- * 
- * This structure holds various configuration options that can be
- * passed to pathfinding algorithms to customize their behavior.
- * 
- * @param heuristic A shared pointer to a heuristic (for informed search algorithms).
- * @param allowDiagonal A boolean indicating whether diagonal movement is allowed.
- * @param diagonalCost The cost associated with diagonal movement.
- */
 struct AlgorithmConfig {
   std::shared_ptr<const IHeuristic> heuristic = nullptr;
   bool allowDiagonal = false;
   Cost diagonalCost = 1.41421356237;
+  bool dontCrossCorners = false;
+  bool bidirectional = false;
 };
 
 /**

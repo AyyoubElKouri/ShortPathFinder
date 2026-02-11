@@ -3,14 +3,14 @@
  *     Becoming an expert won't happen overnight, but with a bit of patience, you'll get there
  *------------------------------------------------------------------------------------------------*/
 
-#include <chrono>
-#include <queue>
-#include <vector>
 #include <algorithm>
+#include <chrono>
+#include <stack>
+#include <vector>
 #include <cstdlib>
-
-#include "algorithms/BFS.hh"
 #include <string>
+
+#include "algorithms/DFS.hh"
 #include "utils/Logger.hh"
 
 namespace {
@@ -27,6 +27,7 @@ bool violatesCornerRule(const IGraph& graph, NodeId u, NodeId v, const std::vect
   Point pu = graph.getNodePosition(u);
   Point pv = graph.getNodePosition(v);
 
+  // Only meaningful for diagonals
   int dx = std::abs(pu.x - pv.x);
   int dy = std::abs(pu.y - pv.y);
   if (dx != 1 || dy != 1) return false;
@@ -43,40 +44,57 @@ bool violatesCornerRule(const IGraph& graph, NodeId u, NodeId v, const std::vect
     if (pn.x == p2.x && pn.y == p2.y) hasP2 = true;
   }
 
+  // If either of the orthogonal neighbors is missing, crossing the corner is not allowed.
   return !(hasP1 && hasP2);
 }
 
 } // namespace
 
-Result BFS::findPath(const IGraph& graph, NodeId start, NodeId goal, const AlgorithmConfig& config) {
+Result DFS::findPath(const IGraph& graph, NodeId start, NodeId goal, const AlgorithmConfig& config) {
   Result res;
   res.success = false;
   res.cost = 0.0;
   res.time = Time::zero();
+
   const auto t0 = std::chrono::steady_clock::now();
-  LOG_INFO(std::string("BFS: start from=") + std::to_string(start) + " to=" + std::to_string(goal));
+
+  LOG_INFO(std::string("DFS: start from=") + std::to_string(start) + " to=" + std::to_string(goal));
 
   NodeCount n = graph.getNodeCount();
   if (start >= n || goal >= n) {
+    LOG_ERROR("DFS: invalid start/goal");
     res.time = Time::zero();
     return res;
   }
 
-  std::vector<bool> seen(n, false);
+  std::vector<bool> visited(n, false);
   std::vector<NodeId> parent(n, static_cast<NodeId>(-1));
-  std::queue<NodeId> q;
 
-  q.push(start);
-  seen[start] = true;
+  struct StackItem {
+    NodeId id;
+    std::size_t nextNeighborIndex;
+  };
+
+  std::stack<StackItem> st;
+  st.push({start, 0});
+  visited[start] = true;
 
   std::vector<Edge> neighbors;
 
-  while (!q.empty()) {
-    NodeId u = q.front(); q.pop();
-    res.visited.push_back(u);
-    if (u == goal) break;
-    graph.getNeighbors(u, neighbors);
-    for (const Edge& e : neighbors) {
+  while (!st.empty()) {
+    StackItem& top = st.top();
+    NodeId u = top.id;
+
+    // First time we see this node in DFS order
+    if (top.nextNeighborIndex == 0) {
+      res.visited.push_back(u);
+      if (u == goal) break;
+      graph.getNeighbors(u, neighbors);
+    }
+
+    bool advanced = false;
+    for (; top.nextNeighborIndex < neighbors.size(); ++top.nextNeighborIndex) {
+      const Edge& e = neighbors[top.nextNeighborIndex];
       NodeId v = e.id;
 
       // Handle diagonal rules
@@ -88,18 +106,29 @@ Result BFS::findPath(const IGraph& graph, NodeId start, NodeId goal, const Algor
         continue;
       }
 
-      if (!seen[v]) {
-        seen[v] = true;
+      if (!visited[v]) {
+        visited[v] = true;
         parent[v] = u;
-        q.push(v);
+        ++top.nextNeighborIndex;
+        st.push({v, 0});
+        advanced = true;
+        break;
+      }
+    }
+
+    if (!advanced) {
+      st.pop();
+      // When we backtrack, neighbors will be refreshed for the new top on the next loop
+      if (!st.empty()) {
+        graph.getNeighbors(st.top().id, neighbors);
       }
     }
   }
 
-  if (!seen[goal]) {
+  if (!visited[goal]) {
     res.success = false;
     res.time = std::chrono::duration_cast<Time>(std::chrono::steady_clock::now() - t0);
-    LOG_WARN("BFS: goal not reached");
+    LOG_WARN("DFS: goal not reached");
     return res;
   }
 
@@ -110,17 +139,23 @@ Result BFS::findPath(const IGraph& graph, NodeId start, NodeId goal, const Algor
   }
   std::reverse(res.path.begin(), res.path.end());
 
-  // compute cost as sum of node costs along path (except start)
+  // Compute cost by summing edge costs along the path
   Cost total = 0.0;
   for (std::size_t i = 1; i < res.path.size(); ++i) {
     std::vector<Edge> tmp;
-    graph.getNeighbors(res.path[i-1], tmp);
-    for (const Edge& e: tmp) if (e.id == res.path[i]) { total += e.cost; break; }
+    graph.getNeighbors(res.path[i - 1], tmp);
+    for (const Edge& e : tmp) {
+      if (e.id == res.path[i]) {
+        total += e.cost;
+        break;
+      }
+    }
   }
 
   res.cost = total;
   res.success = true;
   res.time = std::chrono::duration_cast<Time>(std::chrono::steady_clock::now() - t0);
-  LOG_INFO(std::string("BFS: success cost=") + std::to_string(res.cost));
+  LOG_INFO(std::string("DFS: success cost=") + std::to_string(res.cost));
   return res;
 }
+

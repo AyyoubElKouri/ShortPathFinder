@@ -10,12 +10,12 @@
 export enum Algorithm {
 	DIJKSTRA = "Dijkstra",
 	ASTAR = "A*",
-	IDASTAR = "IDA*",
+	// IDASTAR = "IDA*",
 	BFS = "Breadth First Search",
 	DFS = "Depth First Search",
-	JUMPPOINT = "Jump Point",
-	ORTHOGONALJUMPPOINT = "Orthogonal Jump Point",
-	TRACE = "Trace",
+	// JUMPPOINT = "Jump Point",
+	// ORTHOGONALJUMPPOINT = "Orthogonal Jump Point",
+	// TRACE = "Trace",
 }
 
 /**
