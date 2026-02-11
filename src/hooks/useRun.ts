@@ -76,16 +76,16 @@ export function useRun(): RunReturns {
 						return { value: 1 };
 					case Algorithm.ASTAR:
 						return { value: 2 };
-					case Algorithm.IDASTAR:
-						return { value: 3 };
-					case Algorithm.DFS:
-						return { value: 4 };
-					case Algorithm.JUMPPOINT:
-						return { value: 5 };
-					case Algorithm.ORTHOGONALJUMPPOINT:
-						return { value: 6 };
-					case Algorithm.TRACE:
-						return { value: 7 };
+					// case Algorithm.IDASTAR:
+					// 	return { value: 3 };
+					// case Algorithm.DFS:
+					// 	return { value: 4 };
+					// case Algorithm.JUMPPOINT:
+					// 	return { value: 5 };
+					// case Algorithm.ORTHOGONALJUMPPOINT:
+					// 	return { value: 6 };
+					// case Algorithm.TRACE:
+					// 	return { value: 7 };
 					default:
 						return { value: 1 };
 				}

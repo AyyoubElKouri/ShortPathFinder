@@ -11,9 +11,9 @@ import { Algorithm } from "@/types";
  */
 export function isHeuristic(algorithm: Algorithm): boolean {
 	return (
-		algorithm === Algorithm.ASTAR ||
-		algorithm === Algorithm.IDASTAR ||
-		algorithm === Algorithm.JUMPPOINT ||
-		algorithm === Algorithm.ORTHOGONALJUMPPOINT
+		algorithm === Algorithm.ASTAR //||
+		// algorithm === Algorithm.IDASTAR ||
+		// algorithm === Algorithm.JUMPPOINT ||
+		// algorithm === Algorithm.ORTHOGONALJUMPPOINT
 	);
 }
