@@ -11,8 +11,8 @@ CXXFLAGS ?= -std=c++17 -O2 -Wall -Wextra -Wshadow -Wformat=2 -Wconversion -fno-o
 DEBUG_FLAGS ?= -g -O0
 INCLUDES := -Iincludes -Iincludes/core
 
-# Emscripten (optional)
-EMCC ?= emcc
+# Emscripten (optional) — must be em++ for C++ (operator new, --bind RTTI)
+EMCC ?= em++
 EMCC_FLAGS := --bind -s MODULARIZE=1 -s EXPORT_NAME=PathfindingModule -O2
 EMCC_FLAGS_DEBUG := --bind -s MODULARIZE=1 -s EXPORT_NAME=PathfindingModule -O0 -g4
 
@@ -22,11 +22,14 @@ SRCDIR := src
 BINDIR := bin
 OBJ_DIR := $(BINDIR)/objects
 SRCS := $(wildcard $(SRCDIR)/*.cc)
+# Native build excludes the Emscripten-only Bindings.cc (needs <emscripten/bind.h>)
+NATIVE_SRCS := $(filter-out $(SRCDIR)/Bindings.cc,$(SRCS))
 # native object files (for fast native builds)
-OBJS := $(patsubst $(SRCDIR)/%.cc,$(OBJ_DIR)/%.o,$(SRCS))
+OBJS := $(patsubst $(SRCDIR)/%.cc,$(OBJ_DIR)/%.o,$(NATIVE_SRCS))
 
 # WASM object files (one .wasm.o per source) to allow incremental rebuilds
 WASM_OBJECTS := $(patsubst $(SRCDIR)/%.cc,$(OBJ_DIR)/%.wasm.o,$(SRCS))
+WASM_RELEASE_OBJECTS := $(patsubst $(SRCDIR)/%.cc,$(OBJ_DIR)/%.release.wasm.o,$(SRCS))
 
 PROGRAM := $(BINDIR)/test_app
 WASM_JS := $(BINDIR)/pathfinding.js
@@ -85,6 +88,10 @@ $(OBJ_DIR)/%.wasm.o: $(SRCDIR)/%.cc | $(OBJ_DIR)
 	@echo "[EMCC] Compiling WASM object $< -> $@"
 	$(EMCC) $(EMCC_FLAGS_DEBUG) $(INCLUDES) -c $< -o $@
 
+$(OBJ_DIR)/%.release.wasm.o: $(SRCDIR)/%.cc | $(OBJ_DIR)
+	@echo "[EMCC] Compiling WASM release object $< -> $@"
+	$(EMCC) $(EMCC_FLAGS) $(INCLUDES) -c $< -o $@
+
 wasm: $(WASM_OBJECTS) | $(BINDIR)
 	@command -v $(EMCC) >/dev/null 2>&1 || { echo >&2 "Emscripten (emcc) not found in PATH. Install Emscripten or set EMCC variable."; exit 1; }
 	@echo "[EMCC] Linking WASM (debug) -> $(WASM_JS)"
@@ -93,10 +100,10 @@ wasm: $(WASM_OBJECTS) | $(BINDIR)
 	@if [ -f pathfinding.d.ts ]; then mv pathfinding.d.ts $(BINDIR)/pathfinding.d.ts; fi
 
 
-wasm-release: $(patsubst $(BINDIR)/%.wasm.o,$(BINDIR)/%.wasm.o,$(WASM_OBJECTS)) | $(BINDIR)
+wasm-release: $(WASM_RELEASE_OBJECTS) | $(BINDIR)
 	@command -v $(EMCC) >/dev/null 2>&1 || { echo >&2 "Emscripten (emcc) not found in PATH. Install Emscripten or set EMCC variable."; exit 1; }
 	@echo "[EMCC] Linking WASM (release) -> $(WASM_JS) + $(WASM_WASM)"
-	$(EMCC) $(EMCC_FLAGS) $(WASM_OBJECTS) --emit-tsd pathfinding.d.ts -o $(WASM_JS)
+	$(EMCC) $(EMCC_FLAGS) $(WASM_RELEASE_OBJECTS) --emit-tsd pathfinding.d.ts -o $(WASM_JS)
 	@if [ -f pathfinding.d.ts ]; then mv pathfinding.d.ts $(BINDIR)/pathfinding.d.ts; fi
 
 ###############################################################################

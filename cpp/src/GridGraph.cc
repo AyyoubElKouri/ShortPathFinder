@@ -73,3 +73,8 @@ Point GridGraph::getNodePosition(NodeId nodeId) const {
   }
   return nodes_[nodeId].position;
 }
+
+bool GridGraph::isWalkable(NodeId nodeId) const {
+  if (nodeId >= static_cast<NodeId>(nodes_.size())) return false;
+  return nodes_[nodeId].walkable;
+}

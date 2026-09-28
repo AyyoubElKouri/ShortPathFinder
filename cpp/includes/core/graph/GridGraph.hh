@@ -57,4 +57,10 @@ class GridGraph : public IGraph {
      * @note If the nodeId is invalid, the method will return a default Point (e.g., {0, 0}), and an error will be logged.
      */
     Point getNodePosition(NodeId nodeId) const override;
+
+    bool isWalkable(NodeId nodeId) const override;
+
+    int getWidth() const override { return width_; }
+
+    int getHeight() const override { return height_; }
 };

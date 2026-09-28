@@ -10,6 +10,9 @@
 #include "algorithms/AStar.hh"
 #include "algorithms/DFS.hh"
 #include "algorithms/IDAStar.hh"
+#include "algorithms/JumpPoint.hh"
+#include "algorithms/OrthogonalJumpPoint.hh"
+#include "algorithms/Trace.hh"
 #include "utils/Logger.hh"
 
 std::unique_ptr<IAlgorithm> AlgorithmFactory::createAlgorithm(AlgorithmType type) {
@@ -30,17 +33,14 @@ std::unique_ptr<IAlgorithm> AlgorithmFactory::createAlgorithm(AlgorithmType type
       LOG_INFO("AlgorithmFactory: creating DFS");
       return std::make_unique<DFS>();
     case AlgorithmType::JUMPPOINT:
-      // For now, reuse A* implementation for Jump Point Search visualization.
-      LOG_INFO("AlgorithmFactory: creating JumpPoint (A* fallback)");
-      return std::make_unique<AStar>();
+      LOG_INFO("AlgorithmFactory: creating JumpPoint");
+      return std::make_unique<JumpPoint>();
     case AlgorithmType::ORTHOGONALJUMPPOINT:
-      // Orthogonal Jump Point variant also reuses A*; direction constraints are handled via config.
-      LOG_INFO("AlgorithmFactory: creating OrthogonalJumpPoint (A* fallback)");
-      return std::make_unique<AStar>();
+      LOG_INFO("AlgorithmFactory: creating OrthogonalJumpPoint");
+      return std::make_unique<OrthogonalJumpPoint>();
     case AlgorithmType::TRACE:
-      // Trace behaves like BFS for now, emphasizing exploration order.
-      LOG_INFO("AlgorithmFactory: creating Trace (BFS fallback)");
-      return std::make_unique<BFS>();
+      LOG_INFO("AlgorithmFactory: creating Trace");
+      return std::make_unique<Trace>();
     default:
       LOG_WARN("AlgorithmFactory: unknown algorithm type");
       return nullptr;

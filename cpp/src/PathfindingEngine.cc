@@ -35,7 +35,8 @@ Result PathfindingEngine::findPath(
 
   // Configure heuristic and algorithm
   std::shared_ptr<const IHeuristic> heur = nullptr;
-  if (algorithm == AlgorithmType::ASTAR) {
+  if (algorithm == AlgorithmType::ASTAR || algorithm == AlgorithmType::IDASTAR ||
+      algorithm == AlgorithmType::JUMPPOINT || algorithm == AlgorithmType::ORTHOGONALJUMPPOINT) {
     heur = HeuristicFactory::createHeuristic(heuristic, graph);
   }
 

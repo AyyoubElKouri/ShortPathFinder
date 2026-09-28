@@ -68,6 +68,8 @@ export function useRun(): RunReturns {
 			);
 
 			// map local enums to wasm numeric values (embind expects { value: number })
+			// Must match cpp/includes/types/Enums.hh order:
+			// BFS=0, DIJKSTRA=1, ASTAR=2, IDASTAR=3, DFS=4, JUMPPOINT=5, ORTHOGONALJUMPPOINT=6, TRACE=7
 			const toWasmAlgorithm = (value: Algorithm): any => {
 				switch (value) {
 					case Algorithm.BFS:
@@ -76,16 +78,16 @@ export function useRun(): RunReturns {
 						return { value: 1 };
 					case Algorithm.ASTAR:
 						return { value: 2 };
-					// case Algorithm.IDASTAR:
-					// 	return { value: 3 };
-					// case Algorithm.DFS:
-					// 	return { value: 4 };
-					// case Algorithm.JUMPPOINT:
-					// 	return { value: 5 };
-					// case Algorithm.ORTHOGONALJUMPPOINT:
-					// 	return { value: 6 };
-					// case Algorithm.TRACE:
-					// 	return { value: 7 };
+					case Algorithm.IDASTAR:
+						return { value: 3 };
+					case Algorithm.DFS:
+						return { value: 4 };
+					case Algorithm.JUMPPOINT:
+						return { value: 5 };
+					case Algorithm.ORTHOGONALJUMPPOINT:
+						return { value: 6 };
+					case Algorithm.TRACE:
+						return { value: 7 };
 					default:
 						return { value: 1 };
 				}

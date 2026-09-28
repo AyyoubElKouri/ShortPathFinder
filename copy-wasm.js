@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 // Source and destination directories
-const srcDir = path.join(__dirname, "src", "wasm");
+const srcDir = path.join(__dirname, "cpp", "bin");
 const destDir = path.join(__dirname, "public", "wasm");
 
 // Ensure destination directory exists

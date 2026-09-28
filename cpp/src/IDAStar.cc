@@ -55,9 +55,16 @@ struct SearchState {
   std::vector<NodeId> currentPath;
   std::vector<NodeId> bestPath;
   std::vector<NodeId> visitedOrder;
+  size_t expansionLimit = 200000;
+  bool aborted = false;
 };
 
 Cost dfs(SearchState& state, NodeId node, Cost g, Cost threshold, Cost& bestOverrun) {
+  if (state.aborted) return bestOverrun;
+  if (state.visitedOrder.size() >= state.expansionLimit) {
+    state.aborted = true;
+    return bestOverrun;
+  }
   const IGraph& graph = state.graph;
   const IHeuristic& h = state.heuristic;
   const AlgorithmConfig& config = state.config;
@@ -178,12 +185,12 @@ Result IDAStar::findPath(const IGraph& graph, NodeId start, NodeId goal, const A
       return res;
     }
 
-    if (bestOverrun == INF || bestOverrun <= threshold) {
-      // No solution within any higher threshold
+    if (bestOverrun == INF || bestOverrun <= threshold || state.aborted) {
+      // No solution within any higher threshold (or expansion cap hit)
       res.success = false;
       res.visited = state.visitedOrder;
       res.time = std::chrono::duration_cast<Time>(std::chrono::steady_clock::now() - t0);
-      LOG_WARN("IDA*: no path found");
+      LOG_WARN(state.aborted ? "IDA*: expansion limit reached, aborting" : "IDA*: no path found");
       return res;
     }
 

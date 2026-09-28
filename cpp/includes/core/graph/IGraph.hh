@@ -43,6 +43,21 @@ public:
   virtual Point getNodePosition(NodeId nodeId) const = 0;
 
   /**
+   * @brief Check if a node is walkable.
+   */
+  virtual bool isWalkable(NodeId nodeId) const = 0;
+
+  /**
+   * @brief Get grid width (for grid-based graphs).
+   */
+  virtual int getWidth() const = 0;
+
+  /**
+   * @brief Get grid height (for grid-based graphs).
+   */
+  virtual int getHeight() const = 0;
+
+  /**
    * @brief Virtual destructor for proper cleanup of derived classes.
    */
   virtual ~IGraph() = default;
